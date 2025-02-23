@@ -163,9 +163,9 @@ spring:
           slow-sql-millis: 5000
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://192.168.0.226:3306/lilishop?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
-          password: root
+          password: lilishop
           driver-class-name: com.mysql.cj.jdbc.Driver
           # 多数据源配置
           #multi-datasource1:
@@ -176,9 +176,9 @@ spring:
   #redis 配置
   redis:
     database: 0
-    host: 127.0.0.1
+    host: 192.168.0.226
     port: 6379
-    password: ''
+    password: 'lilishop'
 #mybatis plus 设置
 mybatis-plus:
   mapper-locations: classpath*:org/jeecg/**/xml/*Mapper.xml
@@ -209,7 +209,7 @@ jeecg:
   # 平台上线安全配置
   firewall:
     # 数据源安全 (开启后，Online报表和图表的数据源为必填)
-    dataSourceSafe: true
+    dataSourceSafe: false
     # 低代码模式（dev:开发模式，prod:发布模式——关闭所有在线开发配置能力）
     lowCodeMode: prod
   # 签名密钥串(前后端要一致，正式发布请自行修改)
@@ -231,11 +231,10 @@ jeecg:
     excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/bigscreen/category/**,/bigscreen/visual/**,/bigscreen/map/**,/jmreport/bigscreen2/**,/api/getUserInfo
   #阿里云oss存储和大鱼短信秘钥配置
   oss:
-    accessKey: ??
-    secretKey: ??
-    endpoint: oss-cn-beijing.aliyuncs.com
-    bucketName: jeecgdev
-    staticDomain: https://static.jeecg.com
+    accessKey: LTAI5tDqbpCHciiAYK9qRKdk
+    secretKey: NpWvHiPkR4nw9KuNFkGvRUsMbM3M70
+    endpoint:  oss-cn-hongkong.aliyuncs.com
+    bucketName: botqe-hongkong
     # 短信模板
     sms-template:
       # 签名
@@ -248,11 +247,6 @@ jeecg:
         SMS_465391221:
         # 注册账号短信模板编码
         SMS_175430166:
-  # ElasticSearch 设置
-  elasticsearch:
-    cluster-name: jeecg-ES
-    cluster-nodes: 127.0.0.1:9200
-    check-enabled: false
   # 在线预览文件服务器地址配置
   file-view-domain: http://fileview.jeecg.com
   # minio文件上传
@@ -274,18 +268,18 @@ jeecg:
   #xxl-job配置
   xxljob:
     enabled: false
-    adminAddresses: http://127.0.0.1:9080/xxl-job-admin
+    adminAddresses: http://192.168.0.226:9080/xxl-job-admin
     appname: ${spring.application.name}
     accessToken: ''
-    address: 127.0.0.1:30007
-    ip: 127.0.0.1
+    address: 192.168.0.226:30007
+    ip: 192.168.0.226
     port: 30007
     logPath: logs/jeecg/job/jobhandler/
     logRetentionDays: 30
   #分布式锁配置
   redisson:
-    address: 127.0.0.1:6379
-    password:
+    address: 192.168.0.226:6379
+    password: lilishop
     type: STANDALONE
     enabled: true
   # 百度开放API配置
