@@ -23,7 +23,7 @@ RUN echo "server {  \
                      # 后台接口地址
                      proxy_pass http://jeecg-boot-system:8080/jeecg-boot/; \
                      proxy_redirect default; \
-                     add_header Access-Control-Allow-Origin *; \
+                     add_header Access-Control-Allow-Origin \$http_origin; \
                      add_header Access-Control-Allow-Headers X-Requested-With; \
                      add_header Access-Control-Allow-Methods GET,POST,OPTIONS; \
                    } \
