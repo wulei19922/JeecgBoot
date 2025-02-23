@@ -22,23 +22,23 @@ services:
 #    networks:
 #      - jeecg-boot
 
-  jeecg-boot-redis:
-    image: registry.cn-hangzhou.aliyuncs.com/jeecgdocker/redis:5.0
-    ports:
-      - 6379:6379
-    restart: always
-    hostname: jeecg-boot-redis
-    container_name: jeecg-boot-redis
-    networks:
-      - jeecg-boot
+#  jeecg-boot-redis:
+#    image: registry.cn-hangzhou.aliyuncs.com/jeecgdocker/redis:5.0
+#    ports:
+#      - 6379:6379
+#    restart: always
+#    hostname: jeecg-boot-redis
+#    container_name: jeecg-boot-redis
+#    networks:
+#      - jeecg-boot
 
   jeecg-boot-system:
     build:
       context: ./jeecg-boot/jeecg-module-system/jeecg-system-start
     restart: on-failure
-    depends_on:
-      - jeecg-boot-mysql
-      - jeecg-boot-redis
+#    depends_on:
+#      - jeecg-boot-mysql
+#      - jeecg-boot-redis
     container_name: jeecg-boot-system
     image: jeecg-boot-system
     hostname: jeecg-boot-system
