@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" destroyOnClose :title="title" :width="800" @ok="handleSubmit">
+  <BasicModal v-bind="$attrs" @register="registerModal" destroyOnClose :title="title" :width="896" @ok="handleSubmit">
       <BasicForm @register="registerForm" name="CoinBotForm" />
   </BasicModal>
 </template>
@@ -16,15 +16,13 @@
     const isDetail = ref(false);
     //表单配置
     const [registerForm, { setProps,resetFields, setFieldsValue, validate, scrollToField }] = useForm({
-        labelWidth: 150,
         schemas: formSchema,
         showActionButtonGroup: false,
-        baseColProps: {span: 24}
+        baseColProps: {span: 12}
     });
     //表单赋值
     const [registerModal, {setModalProps, closeModal}] = useModalInner(async (data) => {
         //重置表单
-        console.log(data)
         await resetFields();
         setModalProps({confirmLoading: false,showCancelBtn:!!data?.showFooter,showOkBtn:!!data?.showFooter});
         isUpdate.value = !!data?.isUpdate;

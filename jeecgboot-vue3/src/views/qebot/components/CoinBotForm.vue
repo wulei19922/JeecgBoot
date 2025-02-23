@@ -29,7 +29,7 @@
                 labelWidth: 150,
                 schemas: getBpmFormSchema(props.formData),
                 showActionButtonGroup: false,
-                baseColProps: {span: 24}
+                baseColProps: {span: 12}
             });
 
             const formDisabled = computed(()=>{

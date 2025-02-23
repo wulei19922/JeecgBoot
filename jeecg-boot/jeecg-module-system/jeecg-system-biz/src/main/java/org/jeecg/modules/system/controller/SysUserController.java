@@ -279,7 +279,7 @@ public class SysUserController {
 
     }
 
-    @RequiresPermissions("system:user:queryById")
+//    @RequiresPermissions("system:user:queryById")
     @RequestMapping(value = "/queryById", method = RequestMethod.GET)
     public Result<SysUser> queryById(@RequestParam(name = "id", required = true) String id) {
         Result<SysUser> result = new Result<SysUser>();

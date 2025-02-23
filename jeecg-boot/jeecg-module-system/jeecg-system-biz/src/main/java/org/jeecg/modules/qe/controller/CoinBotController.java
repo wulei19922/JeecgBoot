@@ -92,8 +92,15 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 	@RequiresPermissions("qe:coin_bot:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody CoinBot coinBot) {
-		coinBotService.save(coinBot);
-		return Result.OK("添加成功！");
+		boolean check = coinBotService.check(coinBot);
+		if (check){
+			coinBotService.save(coinBot);
+			return Result.OK("添加成功！");
+
+		}else{
+			return Result.error("该用户 该交易对已经存在机器人，请勿重复添加");
+
+		}
 	}
 	
 	/**
@@ -107,8 +114,15 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 	@RequiresPermissions("qe:coin_bot:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody CoinBot coinBot) {
-		coinBotService.updateById(coinBot);
-		return Result.OK("编辑成功!");
+		boolean check = coinBotService.check(coinBot);
+		if (check){
+			coinBotService.updateById(coinBot);
+			return Result.OK("编辑成功!");
+
+		}else {
+			return Result.error("该用户 该交易对已经存在机器人，请勿重复添加");
+
+		}
 	}
 	
 	/**
@@ -140,8 +154,24 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 		this.coinBotService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.OK("批量删除成功!");
 	}
-	
-	/**
+
+	 /**
+	  *  批量操作
+	  *
+	  * @param ids
+	  * @return
+	  */
+	 @AutoLog(value = "机器人列表-批量操作")
+	 @ApiOperation(value="机器人列表-批量操作", notes="机器人列表-批量操作")
+	 @DeleteMapping(value = "/operateBatch")
+	 public Result<String> operateBatch(@RequestParam(name="ids",required=true) String ids,@RequestParam(name="type",required=true) String type) {
+		 this.coinBotService.operateBatch(Arrays.asList(ids.split(",")),type);
+		 return Result.OK("批量删除成功!");
+	 }
+
+
+
+	 /**
 	 * 通过id查询
 	 *
 	 * @param id
