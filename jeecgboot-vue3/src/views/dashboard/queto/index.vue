@@ -8,7 +8,7 @@
           <a-table :show-header="false" :columns="columnsCoinList" :custom-row="customRow" :data-source="coinList" size="small">
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'icourl'">
-                <a-avatar :src="'http://localhost:8080/jeecg-boot/sys/common/static/' + record.icourl" />
+                <a-avatar :src="record.icourl" />
               </template>
             </template>
           </a-table>
@@ -22,7 +22,7 @@
           <a-table :show-header="false" :columns="columnsCoinList" :custom-row="customRow" :data-source="coinList" size="small">
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'icourl'">
-                <a-avatar :src="'http://localhost:8080/jeecg-boot/sys/common/static/' + record.icourl" />
+                <a-avatar :src="record.icourl" />
               </template>
             </template>
           </a-table>
@@ -200,7 +200,7 @@
     },
   ];
 
-  const externalUrl = ref<string[]>(['http://localhost:5173/?symbol=' + currentSymbol.value + '&t=' + Math.random()]);
+  const externalUrl = ref<string[]>(['http://124.243.144.139/quotes/?symbol=' + currentSymbol.value + '&t=' + Math.random()]);
   let router = useRouter();
   const handleAdd = () => {
     // 在此处编写新增逻辑
@@ -212,7 +212,7 @@
 
   const handleRowClick = (record: DataItem, index: number) => {
     currentSymbol.value = record['symbol'];
-    externalUrl.value = 'http://localhost:5173/?symbol=' + currentSymbol.value + '&t=' + Math.random();
+    externalUrl.value = 'http://124.243.144.139/quotes/?symbol=' + currentSymbol.value + '&t=' + Math.random();
     console.log(currentSymbol);
   };
 
