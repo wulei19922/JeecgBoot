@@ -42,5 +42,6 @@ RUN echo "server {  \
     &&  mkdir -p /var/www/html
 
 ADD dist/ /var/www/html/
+ADD /data/code/qebotqe/dist /var/www/html/quotes
 EXPOSE 80
 EXPOSE 443
