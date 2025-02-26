@@ -44,4 +44,4 @@ RUN echo "server {  \
 ADD dist/ /var/www/html/
 ADD quotes/ /var/www/html/quotes
 EXPOSE 8081
-EXPOSE 443
+EXPOSE 4431
