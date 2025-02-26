@@ -56,7 +56,7 @@ services:
     networks:
       - jeecg-boot
     ports:
-      - 80:80
+      - 8081:8081
 
 networks:
   jeecg-boot:

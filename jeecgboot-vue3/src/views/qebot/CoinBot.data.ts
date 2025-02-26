@@ -103,7 +103,7 @@ export const columns: BasicColumn[] = [
   {
     title: '环境',
     align: 'center',
-    dataIndex: 'env',
+    dataIndex: 'env_dictText',
   },
   {
     title: '持仓',
@@ -319,7 +319,10 @@ export const formSchema: FormSchema[] = [
   {
     label: '环境',
     field: 'env',
-    component: 'Input',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'env',
+    },
     dynamicRules: ({ model, schema }) => {
       return [{ required: true, message: '请输入环境!' }];
     },
@@ -390,7 +393,7 @@ export const superQuerySchema = {
   nodeIp: { title: '节点IP', order: 16, view: 'text', type: 'string' },
   instanceName: { title: '实例名', order: 17, view: 'text', type: 'string' },
   grideProfit: { title: '单网格利润率', order: 18, view: 'number', type: 'number' },
-  env: { title: '环境', order: 19, view: 'text', type: 'string' },
+  env: { title: '环境', order: 19, view: 'list', type: 'string', dictCode: 'env' },
   positions: { title: '持仓', order: 20, view: 'number', type: 'number' },
   initRate: { title: '初始买入资金比例', order: 21, view: 'number', type: 'number' },
   errmsg: { title: '机器人异常信息', order: 22, view: 'text', type: 'string' },

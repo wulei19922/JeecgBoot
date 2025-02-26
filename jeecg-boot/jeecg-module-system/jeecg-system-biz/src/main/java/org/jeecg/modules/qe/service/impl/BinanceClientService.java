@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binance.connector.client.SpotClient;
 import com.binance.connector.client.impl.SpotClientImpl;
 import org.checkerframework.checker.units.qual.A;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.qe.entity.ChargeAddress;
 import org.jeecg.modules.qe.entity.CoinKeys;
 import org.jeecg.modules.qe.entity.CoinSupport;
@@ -29,7 +30,16 @@ public class BinanceClientService {
     ICoinKeysService iCoinKeysService;
 
 
+    @Autowired
+    RedisUtil redisUtil;
     public List<TickerResutl> getList(boolean isUp) {
+
+        if(redisUtil.hasKey("QUETO")){
+            String result= redisUtil.get("QUETO").toString();
+            List<TickerResutl> tickerResutls = JSON.parseArray(result, TickerResutl.class);
+            return  tickerResutls;
+        }
+
         QueryWrapper<CoinSupport> queryWrapper = new QueryWrapper<>();
         if (isUp) {
             queryWrapper.eq("up", "Y");
@@ -78,12 +88,13 @@ public class BinanceClientService {
                     rone.setChange24Hours(one.getFloat("priceChange"));
                 }
         );
-
-
+        redisUtil.set("QUETO",JSON.toJSON(result),1000);
         return result;
     }
 
     public ChargeAddress getChargeAddress(String id) {
+
+
 
 
         QueryWrapper<CoinKeys> queryWrapper = new QueryWrapper();

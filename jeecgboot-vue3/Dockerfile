@@ -3,7 +3,7 @@ MAINTAINER jeecgos@163.com
 VOLUME /tmp
 ENV LANG en_US.UTF-8
 RUN echo "server {  \
-                      listen       80; \
+                      listen       8081; \
 
 
                    location   /jeecgboot/ { \
@@ -43,5 +43,5 @@ RUN echo "server {  \
 
 ADD dist/ /var/www/html/
 ADD quotes/ /var/www/html/quotes
-EXPOSE 80
+EXPOSE 8081
 EXPOSE 443

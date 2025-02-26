@@ -1,29 +1,25 @@
 package org.jeecg.modules.qe.entity;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import org.jeecg.common.constant.ProvinceCityArea;
-import org.jeecg.common.util.SpringContextUtils;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.jeecgframework.poi.excel.annotation.Excel;
-import org.jeecg.common.aspect.annotation.Dict;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Description: 用户平台密钥对
  * @Author: jeecg-boot
- * @Date:   2025-02-24
+ * @Date:   2025-02-25
  * @Version: V1.0
  */
 @Data
@@ -69,4 +65,12 @@ public class CoinKeys implements Serializable {
 	@Dict(dicCode = "env")
     @ApiModelProperty(value = "所属环境")
     private String env;
+	/**止损点数*/
+	@Excel(name = "止损点数", width = 15)
+    @ApiModelProperty(value = "止损点数")
+    private Integer pointLoss;
+	/**止盈点数*/
+	@Excel(name = "止盈点数", width = 15)
+    @ApiModelProperty(value = "止盈点数")
+    private Integer pointProfit;
 }

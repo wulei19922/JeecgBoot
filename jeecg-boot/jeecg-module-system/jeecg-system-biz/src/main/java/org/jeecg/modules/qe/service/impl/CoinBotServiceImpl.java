@@ -35,7 +35,7 @@ public class CoinBotServiceImpl extends ServiceImpl<CoinBotMapper, CoinBot> impl
             if(type.equals("start")){
                 byId.setStatus("1");
             }else{
-                byId.setStatus("0");
+                byId.setStatus("6");
             }
             bots.add(byId);
         }

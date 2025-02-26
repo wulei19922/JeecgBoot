@@ -91,7 +91,11 @@ public class CoinKeysController extends JeecgController<CoinKeys, ICoinKeysServi
 
 		 List<CoinKeys> list = coinKeysService.list(queryWrapper);
 		 if (!list.isEmpty()){
-			 return Result.OK(list.get(0));
+			 //前段加密显示
+			 CoinKeys coinKeys1 = list.get(0);
+			 coinKeys1.setApiKey("******************");
+			 coinKeys1.setApiSecret("******************");
+			 return Result.OK(coinKeys1);
 		 }else{
 			 return Result.OK(null);
 		 }
@@ -207,6 +211,10 @@ public class CoinKeysController extends JeecgController<CoinKeys, ICoinKeysServi
 	 public Result<String> useradd(@RequestBody CoinKeys coinKeys) {
 		 LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		if(StringUtils.hasText(coinKeys.getId())){
+			if(coinKeys.getApiKey().equals("******************")){
+				coinKeys.setApiKey(null);
+				coinKeys.setApiSecret(null);
+			}
 			coinKeysService.updateById(coinKeys);
 		}else{
 			coinKeys.setEnv("prod");

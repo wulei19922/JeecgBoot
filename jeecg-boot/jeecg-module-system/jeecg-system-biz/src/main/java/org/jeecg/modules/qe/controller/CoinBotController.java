@@ -10,6 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.alibaba.fastjson.JSONObject;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
@@ -166,9 +168,20 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 	 @DeleteMapping(value = "/operateBatch")
 	 public Result<String> operateBatch(@RequestParam(name="ids",required=true) String ids,@RequestParam(name="type",required=true) String type) {
 		 this.coinBotService.operateBatch(Arrays.asList(ids.split(",")),type);
+
 		 return Result.OK("批量删除成功!");
 	 }
 
+	 @AutoLog(value = "机器人列表-批量操作")
+	 @ApiOperation(value="机器人列表-批量操作", notes="机器人列表-批量操作")
+	 @PostMapping(value = "/operateBatch")
+	 public Result<String> stopAllBot(@RequestBody JSONObject jsonObject) {
+		 String ids=jsonObject.getString("ids");
+		 String type=jsonObject.getString("type");
+		 this.coinBotService.operateBatch(Arrays.asList(ids.split(",")),type);
+
+		 return Result.OK("批量删除成功!");
+	 }
 
 
 	 /**
