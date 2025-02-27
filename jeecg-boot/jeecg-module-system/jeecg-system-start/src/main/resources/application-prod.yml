@@ -331,3 +331,6 @@ justauth:
     type: default
     prefix: 'demo::'
     timeout: 1h
+coin:
+  wallet:
+    account: 1895040445819490305
