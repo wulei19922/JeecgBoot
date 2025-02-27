@@ -17,16 +17,16 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: 用户平台密钥对
+ * @Description: 用户平台个人信息
  * @Author: jeecg-boot
- * @Date:   2025-02-25
+ * @Date:   2025-02-27
  * @Version: V1.0
  */
 @Data
 @TableName("coin_keys")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="coin_keys对象", description="用户平台密钥对")
+@ApiModel(value="coin_keys对象", description="用户平台个人信息")
 public class CoinKeys implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -51,8 +51,8 @@ public class CoinKeys implements Serializable {
     @ApiModelProperty(value = "apiSecret")
     private String apiSecret;
 	/**memberId*/
-	@Excel(name = "memberId", width = 15, dictTable = "sys_user", dicText = "realname", dicCode = "id")
-	@Dict(dictTable = "sys_user", dicText = "realname", dicCode = "id")
+	@Excel(name = "memberId", width = 15, dictTable = "sys_user", dicText = "username", dicCode = "id")
+	@Dict(dictTable = "sys_user", dicText = "username", dicCode = "id")
     @ApiModelProperty(value = "memberId")
     private String memberId;
 	/**交易所平台*/
@@ -68,9 +68,25 @@ public class CoinKeys implements Serializable {
 	/**止损点数*/
 	@Excel(name = "止损点数", width = 15)
     @ApiModelProperty(value = "止损点数")
-    private Integer pointLoss;
+    private Double pointLoss;
 	/**止盈点数*/
 	@Excel(name = "止盈点数", width = 15)
     @ApiModelProperty(value = "止盈点数")
-    private Integer pointProfit;
+    private Double pointProfit;
+	/**机器人总点数*/
+	@Excel(name = "机器人总点数", width = 15)
+    @ApiModelProperty(value = "机器人总点数")
+    private Double bpTotal;
+	/**剩余点数*/
+	@Excel(name = "剩余点数", width = 15)
+    @ApiModelProperty(value = "剩余点数")
+    private Double bpPointFree;
+	/**用户描述*/
+	@Excel(name = "用户描述", width = 15)
+    @ApiModelProperty(value = "用户描述")
+    private String keyName;
+	/**资金密码*/
+	@Excel(name = "资金密码", width = 15)
+    @ApiModelProperty(value = "资金密码")
+    private String fundPwd;
 }

@@ -217,7 +217,7 @@ jeecg:
   #签名拦截接口
   signUrls: /sys/dict/getDictItems/*,/sys/dict/loadDict/*,/sys/dict/loadDictOrderByValue/*,/sys/dict/loadDictItem/*,/sys/dict/loadTreeData,/sys/api/queryTableDictItemsByCode,/sys/api/queryFilterTableDictInfo,/sys/api/queryTableDictByKeys,/sys/api/translateDictFromTable,/sys/api/translateDictFromTableByKeys,/sys/sendChangePwdSms,/sys/user/sendChangePhoneSms,/sys/sms,/desform/api/sendVerifyCode
   # 本地：local、Minio：minio、阿里云：alioss
-  uploadType: local
+  uploadType: alioss
   # 前端访问地址
   domainUrl:
     pc: http://localhost:3100
@@ -234,7 +234,7 @@ jeecg:
     accessKey: LTAI5tDqbpCHciiAYK9qRKdk
     secretKey: NpWvHiPkR4nw9KuNFkGvRUsMbM3M70
     endpoint:  oss-cn-hongkong.aliyuncs.com
-    bucketName: jeecgdev
+    bucketName: botqe-hongkong
     # 短信模板
     sms-template:
       # 签名
@@ -335,3 +335,7 @@ justauth:
     type: default
     prefix: 'demo::'
     timeout: 1h
+
+coin:
+   wallet:
+       account: 1895040445819490305

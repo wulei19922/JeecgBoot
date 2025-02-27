@@ -2,6 +2,7 @@ package org.jeecg.modules.qe.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,6 +28,8 @@ import org.jeecg.modules.qe.service.ICoinKeysService;
 import org.jeecg.modules.qe.service.ICoinUserService;
 import org.jeecg.modules.qe.service.ICoinVersionService;
 import org.jeecg.modules.qe.service.impl.BinanceClientService;
+import org.jeecg.modules.qe.service.impl.BinanceWithDrawService;
+import org.jeecg.modules.qe.utils.PasswordService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.security.auth.login.LoginContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -72,12 +76,107 @@ public class CoinCustomController {
     @Autowired
     private ICoinUserService iCoinUserService;
 
+    @Autowired
+    BinanceWithDrawService binanceWithDrawService;
+
+    @Autowired
+    ICoinKeysService coinKeysService;
+    @ApiOperation(value = "修改交易密码", notes = "修改交易密码")
+    @PostMapping(value = "/trade/uppwd")
+    public Result< Boolean > updateTradePwd(@RequestBody JSONObject jsonObject) {
+
+        String loginPassword = jsonObject.getString("loginPassword");
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        //校验用户登陆密码
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getUsername,loginUser.getUsername());
+        SysUser sysUser = sysUserService.getOne(queryWrapper);
+
+
+        // step.3 校验用户名或密码是否正确
+        String userpassword = PasswordUtil.encrypt(sysUser.getUsername(), loginPassword, sysUser.getSalt());
+        String syspassword = sysUser.getPassword();
+        if (!syspassword.equals(userpassword)) {
+            return   Result.error("登陆密码错误");
+        }
+
+
+        QueryWrapper<CoinKeys> keyqueryWrapper = new QueryWrapper<>();
+        keyqueryWrapper.eq("member_id",sysUser.getId());
+        keyqueryWrapper.eq("exchange","BINANCE");
+        keyqueryWrapper.eq("env","prod");
+        List<CoinKeys> list = coinKeysService.list(keyqueryWrapper);
+        if(!list.isEmpty()){
+            CoinKeys coinKeys = list.get(0);
+            String newPwd=jsonObject.getString("newPwd");
+            coinKeys.setFundPwd(PasswordService.hashPassword(newPwd));
+            coinKeysService.updateById(coinKeys);
+
+        }else{
+            CoinKeys coinKeys=new CoinKeys();
+            coinKeys.setEnv("prod");
+            coinKeys.setExchange("BINANCE");
+            coinKeys.setCreateTime(new Date());
+            coinKeys.setMemberId(sysUser.getId());
+            coinKeys.setCreateBy(sysUser.getUsername());
+            String newPwd=jsonObject.getString("newPwd");
+            coinKeys.setFundPwd(PasswordService.hashPassword(newPwd));
+            coinKeysService.save(coinKeys);
+        }
+
+        return  Result.ok(true);
+
+    }
+
+    @ApiOperation(value = "充值机器人币", notes = "充值机器人币")
+    @PostMapping(value = "/charge")
+    public Result< Boolean > chargeBot(@RequestBody JSONObject jsonObject) {
+
+        //教研交易面膜
+
+        String code = jsonObject.getString("code");
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        QueryWrapper<CoinKeys> keyqueryWrapper = new QueryWrapper<>();
+        keyqueryWrapper.eq("member_id",loginUser.getId());
+        keyqueryWrapper.eq("exchange","BINANCE");
+        keyqueryWrapper.eq("env","prod");
+        CoinKeys coinKeys = coinKeysService.getOne(keyqueryWrapper);
+        boolean cehck = PasswordService.verifyPassword(code, coinKeys.getFundPwd());
+        if(cehck){
+
+            BigDecimal amount = jsonObject.getBigDecimal("amount");
+            boolean w=binanceWithDrawService.withTrade(loginUser.getId(),amount);
+            if(w){
+                return Result.OK(true);
+            }else{
+                return Result.OK(false);
+            }
+        }else{
+          return   Result.error("资金密码错误");
+        }
+
+
+    }
+
+    @ApiOperation(value = "查询推荐关系", notes = "查询推荐关系")
+    @GetMapping(value = "/invite/list")
+    public Result< Map > getInviteInfo() {
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+
+        //获得一层
+        List<Map> list=iCoinUserService.getInviteList(sysUser.getId());
+
+        Map r=new HashMap();
+        r.put("rank",list);
+        r.put("invitecode",sysUser.getId());
+
+        return Result.OK(r);
+    }
+
     @ApiOperation(value = "查询行情", notes = "查询行情-分页列表查询")
     @GetMapping(value = "/tickers/list")
     public Result<List<TickerResutl>> getData() {
-
         List<TickerResutl> list = binanceClientService.getList(false);
-
         return Result.OK(list);
     }
 

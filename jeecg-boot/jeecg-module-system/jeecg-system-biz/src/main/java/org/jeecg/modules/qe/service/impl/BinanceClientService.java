@@ -12,13 +12,14 @@ import org.jeecg.modules.qe.entity.ChargeAddress;
 import org.jeecg.modules.qe.entity.CoinKeys;
 import org.jeecg.modules.qe.entity.CoinSupport;
 import org.jeecg.modules.qe.entity.TickerResutl;
+import org.jeecg.modules.qe.mapper.CoinKeysMapper;
 import org.jeecg.modules.qe.service.ICoinKeysService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+import com.binance.connector.client.SpotClient;
 
 @Service
 public class BinanceClientService {
@@ -32,6 +33,10 @@ public class BinanceClientService {
 
     @Autowired
     RedisUtil redisUtil;
+
+
+
+
     public List<TickerResutl> getList(boolean isUp) {
 
         if(redisUtil.hasKey("QUETO")){
@@ -93,10 +98,6 @@ public class BinanceClientService {
     }
 
     public ChargeAddress getChargeAddress(String id) {
-
-
-
-
         QueryWrapper<CoinKeys> queryWrapper = new QueryWrapper();
         queryWrapper.eq("member_id", id);
         queryWrapper.eq("env", "prod");
@@ -150,4 +151,90 @@ public class BinanceClientService {
 
 
     }
+
+    private static double getUSDTBalance(JSONObject account) {
+        JSONArray balances = account.getJSONArray("balances");
+
+        for (Object o: balances) {
+            JSONObject oj=(JSONObject) o;
+            if (oj.getString("asset").equals("USDT")) {
+                return oj.getDouble("free");
+            }
+
+        }
+        return 0.0;
+    }
+
+    public static void main(String[] args) {
+        String mainApiKey = "5tiDiv3NI0U107lFfBdenGZNkdNElakAdFuCd3mQGW3S9IbI7gQNHLLLMFEfwy9h";
+        String mainSecretKey = "TVPiuFyWkundIXJrXbce4TXwkhDWmoMm0xBe124ETr0rP8NK7yCrYL9ZqHnEK6Nn";
+
+        String otherMainApiKey = "5vQGewWTDLzz8HBvbmwYo0ahmqDCQtk8u82jlBwzGhScKiqepTgetao4m7OjCzBv";
+        String otherMainSecretKey = "Az9dXjnwXPgxu7NmUyDx956DGltcKvvOYwqqLT6Ajcmu0VdSnBtonNRCIScbfGqz";
+        String otherMainAccountAddress = "other_main_account_usdt_address";
+
+        SpotClient mainSpotClient = new SpotClientImpl(mainApiKey, mainSecretKey);
+        SpotClient otherMainSpotClient = new SpotClientImpl(otherMainApiKey, otherMainSecretKey);
+        Map param=new HashMap();
+        param.put("recvWindow",2000);
+        param.put("omitZeroBalances",true);
+        param.put("timestamp",System.currentTimeMillis());
+        //获得交易设置
+
+//        String s = mainSpotClient.createWallet().assetDetail(param);
+//        System.out.println("交易设置"+s);
+        // 获取主账户USDT余额
+        String  mainAccountStr=mainSpotClient.createTrade().account(param);
+        System.out.println(mainAccountStr);
+        JSONObject mainAccount = JSONObject.parseObject(mainAccountStr);
+        double mainUSDTBalance = getUSDTBalance(mainAccount);
+        System.out.println("主账户USDT余额（转账前）： " + mainUSDTBalance);
+
+        Map otherparam=new HashMap();
+        otherparam.put("recvWindow",4000);
+        otherparam.put("omitZeroBalances",true);
+        otherparam.put("timestamp",System.currentTimeMillis());
+        String  otherAccountStr=otherMainSpotClient.createTrade().account(otherparam);
+        System.out.println(otherAccountStr);
+        JSONObject otherAccount = JSONObject.parseObject(otherAccountStr);
+        double otherUSDTBalance = getUSDTBalance(otherAccount);
+        System.out.println("其他USDT余额（转账前）： " + otherUSDTBalance);
+
+        Map add=new HashMap();
+        add.put("coin","USDT");
+        add.put("network","TRX");
+
+        String addressDetail = otherMainSpotClient.createWallet().depositAddress(add);
+        JSONObject address=JSONObject.parseObject(addressDetail);
+        System.out.println("miaoyan账户充值地址： " + addressDetail);
+//        LinkedHashMap<String, Object> depositParams = new LinkedHashMap<>();
+//        depositParams.put("coin", "USDT"); // 指定币种
+//        String depositAddress = client.createWallet().depositAddress(depositParams);
+//        JSONObject jsonObject = JSON.parseObject(depositAddress);
+
+
+
+        Map tradeParam=new HashMap();
+        tradeParam.put("coin",address.getString("coin"));
+        tradeParam.put("address",address.getString("address"));
+        tradeParam.put("network","TRX");
+        tradeParam.put("amount","0.01");
+        tradeParam.put("transactionFeeFlag",true);
+//        // 向另一个主账户转账20 USDT
+//         String drawdetail=mainSpotClient.createWallet().withdraw(tradeParam);
+//         System.out.println("转账详情"+drawdetail);
+
+        double mainUSDTBalanceAfter = getUSDTBalance(mainAccount);
+        System.out.println("主账户USDT余额（转账后）： " + mainUSDTBalanceAfter);
+
+
+
+
+
+    }
+
+
+
+
+
 }
