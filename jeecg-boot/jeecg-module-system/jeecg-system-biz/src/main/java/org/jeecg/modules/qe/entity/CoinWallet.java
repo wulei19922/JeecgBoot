@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * @Description: 量化钱包
  * @Author: jeecg-boot
- * @Date:   2025-02-27
+ * @Date:   2025-02-28
  * @Version: V1.0
  */
 @Data
@@ -80,4 +80,8 @@ public class CoinWallet implements Serializable {
 	@Dict(dicCode = "exchange")
     @ApiModelProperty(value = "所属平台")
     private String exchange;
+	/**今日盈利*/
+	@Excel(name = "今日盈利", width = 15)
+    @ApiModelProperty(value = "今日盈利")
+    private Double dayProfit;
 }
