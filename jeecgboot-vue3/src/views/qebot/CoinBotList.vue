@@ -34,6 +34,58 @@
     </BasicTable>
     <!-- 表单区域 -->
     <CoinBotModal @register="registerModal" @success="handleSuccess" />
+
+    <div>
+      <a-modal v-model:open="open" width="100%" wrap-class-name="full-modal" title="机器人参数" @ok="handleOk">
+        <a-row>
+          <a-col :span="8">
+            <span>网格参数</span>
+            <a-table :columns="gridColumns" :data-source="currentBot" :pagination="false" @resize-column="handleResizeColumn">
+            </a-table>
+          </a-col>
+          <a-col :span="16">
+            <span>匹配订单</span>
+            <a-table :columns="orderColumns" :data-source="currentOrder" :pagination="false" @resize-column="handleResizeColumn">
+              <template #headerCell="{ column }">
+                <template v-if="column.key === 'buy_order_num'">
+                  <span>
+                    <smile-outlined />
+                    买入数量
+                  </span>
+                </template>
+              </template>
+
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'buy_price'">
+                  <a>
+                    {{ record.buy_price }}
+                  </a>
+                </template>
+                <template v-else-if="column.key === 'tags'">
+                  <span>
+                    <a-tag v-for="tag in record.tags" :key="tag" :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'">
+                      {{ tag.toUpperCase() }}
+                    </a-tag>
+                  </span>
+                </template>
+                <template v-else-if="column.key === 'action'">
+                  <span>
+                    <a>Invite 一 {{ record.name }}</a>
+                    <a-divider type="vertical" />
+                    <a>Delete</a>
+                    <a-divider type="vertical" />
+                    <a class="ant-dropdown-link">
+                      More actions
+                      <down-outlined />
+                    </a>
+                  </span>
+                </template>
+              </template>
+            </a-table>
+          </a-col>
+        </a-row>
+      </a-modal>
+    </div>
   </div>
 </template>
 
@@ -45,14 +97,22 @@
   import CoinBotModal from './components/CoinBotModal.vue';
   import { columns, searchFormSchema, superQuerySchema } from './CoinBot.data';
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, batchOperate } from './CoinBot.api';
+  import { list as orderList } from '../coinOrder/CoinOrder.api';
+
   import { downloadFile } from '/@/utils/common/renderUtils';
   import { useUserStore } from '/@/store/modules/user';
   import msg from '@/views/demo/feat/msg/index.vue';
+  import { TableColumnsType } from 'ant-design-vue';
+  import HeadInfo from "@/components/chart/HeadInfo.vue";
   const queryParam = reactive<any>({});
   const checkedKeys = ref<Array<string | number>>([]);
   const userStore = useUserStore();
   //注册model
   const [registerModal, { openModal }] = useModal();
+  const baseStyle: CSSProperties = {
+    width: '25%',
+    height: '54px',
+  };
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -86,13 +146,125 @@
       success: handleSuccess,
     },
   });
+  const gridColumns = ref<TableColumnsType>([
+    {
+      title: '买入订单',
+      dataIndex: 'buy_order_id',
+      key: 'buy_order_id',
+      resizable: true,
+      width: 50,
+    },
+    {
+      title: '买入数量',
+      dataIndex: 'buy_order_num',
+      key: 'buy_order_num',
+      resizable: true,
+      minWidth: 30,
+      maxWidth: 50,
+    },
+    {
+      title: '买入价格',
+      dataIndex: 'buy_price',
+      key: 'buy_price',
+      maxWidth: 50,
+    },
+    {
+      title: '卖出订单',
+      key: 'sell_order_id',
+      dataIndex: 'sell_order_id',
+      maxWidth: 50,
+    },
+    {
+      title: '卖出价格',
+      key: 'sell_price',
+      dataIndex: 'sell_price',
+      maxWidth: 50,
+    },
+  ]);
+  const orderColumns = ref<TableColumnsType>([
+    {
+      title: '方向',
+      align: 'center',
+      dataIndex: 'silder',
+    },
+    {
+      title: '	订单类型',
+      align: 'center',
+      dataIndex: 'orderType',
+    },
+    {
+      title: '	成交均价',
+      align: 'center',
+      dataIndex: 'avgPrice',
+    },
+    {
+      title: '成交数量',
+      align: 'center',
+      dataIndex: 'num',
+    },
+    {
+      title: '成交价格',
+      align: 'center',
+      dataIndex: 'price',
+    },
+    // {
+    //   title: '机器人ID',
+    //   align: 'center',
+    //   dataIndex: 'botId_dictText',
+    // },
+    {
+      title: '状态',
+      align: 'center',
+      dataIndex: 'status_dictText',
+    },
+    {
+      title: '币安订单ID',
+      align: 'center',
+      dataIndex: 'orderId',
+    },
+    {
+      title: '交易对',
+      align: 'center',
+      dataIndex: 'symbol',
+    },
+    {
+      title: '匹配对',
+      align: 'center',
+      dataIndex: 'matchId',
+    },
+  ]);
 
   const [registerTable, { reload }, { rowSelection, selectedRowKeys }] = tableContext;
 
   // 高级查询配置
   const superQueryConfig = reactive(superQuerySchema);
 
-  /**
+  const open = ref<boolean>(false);
+  const currentBot = ref<Object>(false);
+  const currentOrder = ref<Object>(false);
+  const showBuyModal = (record) => {
+    currentBot.value = JSON.parse(record.gridConfig);
+    let params = {
+      column: 'createTime',
+      order: 'desc',
+      pageNo: 1,
+      pageSize: 10,
+      botId: '1895698783372677121_dogeusdt_BINANCE_spot_gride',
+    };
+    //请求匹配订单
+    orderList(params).then((res) => {
+      currentOrder.value = res.records;
+    });
+    console.log(currentBot.value);
+    open.value = true;
+  };
+
+  const handleOk = (e: MouseEvent) => {
+    console.log(e);
+    open.value = false;
+  };
+
+  /*
    * 高级查询事件
    */
   function handleSuperQuery(params) {
@@ -156,7 +328,7 @@
       msg = '是否停止选中机器人，该操作执行后，机器人将会停止量化交易';
     }
 
-    await batchOperate({ ids: selectedRowKeys.value, message: msg,type:message }, handleSuccess);
+    await batchOperate({ ids: selectedRowKeys.value, message: msg, type: message }, handleSuccess);
   }
   /**
    * 成功回调
@@ -181,6 +353,10 @@
    */
   function getDropDownAction(record) {
     return [
+      {
+        label: '买入明细',
+        onClick: showBuyModal.bind(null, record),
+      },
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),
