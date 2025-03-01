@@ -15,6 +15,7 @@ import org.jeecg.common.system.query.QueryRuleEnum;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.qe.entity.CoinKeys;
+import org.jeecg.modules.qe.entity.CoinWallet;
 import org.jeecg.modules.qe.service.ICoinKeysService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -22,6 +23,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.qe.service.ICoinWalletService;
+import org.jeecg.modules.qe.service.impl.BinanceWithDrawService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -53,6 +56,13 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class CoinKeysController extends JeecgController<CoinKeys, ICoinKeysService> {
 	@Autowired
 	private ICoinKeysService coinKeysService;
+
+	@Autowired
+
+	private BinanceWithDrawService binanceWithDrawService;
+
+	@Autowired
+	private ICoinWalletService coinWalletService;
 	
 	/**
 	 * 分页列表查询
@@ -210,23 +220,60 @@ public class CoinKeysController extends JeecgController<CoinKeys, ICoinKeysServi
 	 @PostMapping(value = "/useradd")
 	 public Result<String> useradd(@RequestBody CoinKeys coinKeys) {
 		 LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		if(StringUtils.hasText(coinKeys.getId())){
-			if(coinKeys.getApiKey().equals("******************")){
-				coinKeys.setApiKey(null);
-				coinKeys.setApiSecret(null);
-			}
-			coinKeysService.updateById(coinKeys);
-		}else{
-			coinKeys.setEnv("prod");
-			coinKeys.setExchange("BINANCE");
-			coinKeys.setCreateTime(new Date());
-			coinKeys.setMemberId(sysUser.getId());
-			coinKeys.setCreateBy(sysUser.getUsername());
-			coinKeysService.save(coinKeys);
-		}
+		 //**教研key是否有效
+		 //检查是否初始化用户钱包
+		 CoinWallet coinWallet = binanceWithDrawService.getCoinWallet(sysUser.getId());
 
 
-		 return Result.OK("添加成功！");
+		 Double  free = binanceWithDrawService.getWallet(sysUser.getId(),"BINANCE",coinKeys.getApiKey(),coinKeys.getApiSecret());
+
+		 if (free>=0D){
+			 if (coinWallet!=null){
+				 coinWallet.setFree(free);
+				 coinWallet.setUpdateBy(sysUser.getUsername());
+				 coinWallet.setUpdateTime(new Date());
+				 coinWalletService.updateById(coinWallet);
+				 //同步钱包数据
+			 }else{
+				 CoinWallet wallet=new CoinWallet();
+				 wallet.setFree(0D);
+				 wallet.setSymbol("USDT");
+				 wallet.setExchange("BINANCE");
+				 wallet.setLocked(0D);
+				 wallet.setCreateBy(sysUser.getUsername());
+				 wallet.setCreateTime(new Date());
+				 wallet.setDayProfit(0D);
+				 wallet.setMemberId(sysUser.getId());
+				 coinWalletService.save(wallet);
+				 //初始化钱包
+			 }
+			 if(StringUtils.hasText(coinKeys.getId())){
+				 if(coinKeys.getApiKey().equals("******************")){
+					 coinKeys.setApiKey(null);
+					 coinKeys.setApiSecret(null);
+				 }
+				 coinKeysService.updateById(coinKeys);
+			 }else{
+				 coinKeys.setEnv("prod");
+				 coinKeys.setExchange("BINANCE");
+				 coinKeys.setCreateTime(new Date());
+				 coinKeys.setMemberId(sysUser.getId());
+				 coinKeys.setCreateBy(sysUser.getUsername());
+				 coinKeysService.save(coinKeys);
+			 }
+
+
+			 return Result.OK("添加成功！");
+
+		 }else{
+			 return Result.error("KEY无效");
+
+		 }
+
+
+
+
+
 	 }
 
 }

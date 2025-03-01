@@ -53,14 +53,24 @@ public class BinanceWithDrawService {
 
     //获得财务收款账号地址
 
-    public CoinWallet getWallet(String id) {
-        LambdaQueryWrapper<CoinWallet> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(CoinWallet::getMemberId, id);
-        List<CoinWallet> list = coinWalletService.list(queryWrapper);
-        if (!list.isEmpty()) {
-            return list.get(0);
+    public Double getWallet(String id,String type,String key,String secret) {
+        try {
+            SpotClient client = new SpotClientImpl(key, secret);
+            Map param = new HashMap();
+            param.put("recvWindow", 3000);
+            param.put("omitZeroBalances", true);
+            param.put("timestamp", System.currentTimeMillis());
+            //获得交易设置
+            // 获取主账户USDT余额
+            String mainAccountStr = client.createTrade().account(param);
+            JSONObject mainAccount = JSONObject.parseObject(mainAccountStr);
+            double currentBanance = getUSDTBalance(mainAccount);
+            log.info("当前用户" + client + " USDT余额（转账前）： " + currentBanance);
+            return currentBanance;
+        }catch (Exception e ){
+            log.info("当前key不合法",e);
+            return -99d;
         }
-        return null;
     }
 
 
@@ -77,7 +87,6 @@ public class BinanceWithDrawService {
     }
 
     public CoinWallet getCoinWallet(String memberid){
-
         //获得当前用户钱包
         LambdaQueryWrapper<CoinWallet>queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(CoinWallet::getMemberId, memberid);
@@ -91,10 +100,8 @@ public class BinanceWithDrawService {
 
         try {
             //获得目标配置
-            CoinWallet managerWallet = getWallet(manager);
             CoinKeys manageCoinConfig = getKeysCoinConfig(manager);
             //获得源配置
-            CoinWallet origin = getWallet(memberid);
             CoinKeys originCoinConfig = getKeysCoinConfig(memberid);
 
             String originApiKey = originCoinConfig.getApiKey();
@@ -150,7 +157,6 @@ public class BinanceWithDrawService {
             paramAfter.put("omitZeroBalances", true);
             paramAfter.put("timestamp", System.currentTimeMillis());
             //获得交易设置
-
             // 获取主账户USDT余额
             String mainAccountStrAfter = originSpotClient.createTrade().account(paramAfter);
             JSONObject mainAccountAfter = JSONObject.parseObject(mainAccountStrAfter);
@@ -159,6 +165,9 @@ public class BinanceWithDrawService {
 
             coinWalletService.updateUserWallet(manager,memberid,usdtBalanceAfter,currentBanance,amount);
             coinFundsChangeMapper.userWalletAdd(amount.doubleValue(),memberid);
+            //保存机器人点数
+
+
             return true;
         } catch (Exception e) {
             log.error("转账失败", e);
@@ -220,79 +229,79 @@ public class BinanceWithDrawService {
         return 0.0;
     }
 
-    public static void main(String[] args) {
-
-        String mainApiKey = "5tiDiv3NI0U107lFfBdenGZNkdNElakAdFuCd3mQGW3S9IbI7gQNHLLLMFEfwy9h";
-        String mainSecretKey = "TVPiuFyWkundIXJrXbce4TXwkhDWmoMm0xBe124ETr0rP8NK7yCrYL9ZqHnEK6Nn";
-
-        String otherMainApiKey = "5vQGewWTDLzz8HBvbmwYo0ahmqDCQtk8u82jlBwzGhScKiqepTgetao4m7OjCzBv";
-        String otherMainSecretKey = "Az9dXjnwXPgxu7NmUyDx956DGltcKvvOYwqqLT6Ajcmu0VdSnBtonNRCIScbfGqz";
-        String otherMainAccountAddress = "other_main_account_usdt_address";
-
-        SpotClient mainSpotClient = new SpotClientImpl(mainApiKey, mainSecretKey);
-        SpotClient otherMainSpotClient = new SpotClientImpl(otherMainApiKey, otherMainSecretKey);
-        Map param = new HashMap();
-        param.put("recvWindow", 2000);
-        param.put("omitZeroBalances", true);
-        param.put("timestamp", System.currentTimeMillis());
-        //获得交易设置
-
-//        String s = mainSpotClient.createWallet().assetDetail(param);
-//        System.out.println("交易设置"+s);
-        // 获取主账户USDT余额
-        String mainAccountStr = mainSpotClient.createTrade().account(param);
-        System.out.println(mainAccountStr);
-        JSONObject mainAccount = JSONObject.parseObject(mainAccountStr);
-        double mainUSDTBalance = getUSDTBalance(mainAccount);
-        System.out.println("主账户USDT余额（转账前）： " + mainUSDTBalance);
-
-        Map otherparam = new HashMap();
-        otherparam.put("recvWindow", 4000);
-        otherparam.put("omitZeroBalances", true);
-        otherparam.put("timestamp", System.currentTimeMillis());
-        String otherAccountStr = otherMainSpotClient.createTrade().account(otherparam);
-        System.out.println(otherAccountStr);
-        JSONObject otherAccount = JSONObject.parseObject(otherAccountStr);
-        double otherUSDTBalance = getUSDTBalance(otherAccount);
-        System.out.println("其他USDT余额（转账前）： " + otherUSDTBalance);
-
-        Map add = new HashMap();
-        add.put("coin", "USDT");
-        add.put("network", "TRX");
-
-        String addressDetail = otherMainSpotClient.createWallet().depositAddress(add);
-        JSONObject address = JSONObject.parseObject(addressDetail);
-        System.out.println("miaoyan账户充值地址： " + addressDetail);
-//        LinkedHashMap<String, Object> depositParams = new LinkedHashMap<>();
-//        depositParams.put("coin", "USDT"); // 指定币种
-//        String depositAddress = client.createWallet().depositAddress(depositParams);
-//        JSONObject jsonObject = JSON.parseObject(depositAddress);
-
-
-        Map tradeParam = new HashMap();
-        tradeParam.put("coin", address.getString("coin"));
-        tradeParam.put("address", address.getString("address"));
-        tradeParam.put("network", "TRX");
-        tradeParam.put("amount", "0.001");
-        tradeParam.put("transactionFeeFlag", true);
-//        // 向另一个主账户转账20 USDT
-//         String drawdetail=mainSpotClient.createWallet().withdraw(tradeParam);
-//         System.out.println("转账详情"+drawdetail);
-
-
-        Map detailParam = new HashMap();
-//        detailParam.put("coin", "USDT");
-//        detailParam.put("withdrawOrderId", "73fe9b56490740578f8bd7e62a35e1ef");
-//        detailParam.put("status", 0);
-        detailParam.put("idList", "73fe9b56490740578f8bd7e62a35e1ef");
-
-
-        String detail = mainSpotClient.createWallet().withdrawHistory(detailParam);
-
-        System.out.println("订单详情  " + detail);
-
-
-    }
+//    public static void main(String[] args) {
+//
+//        String mainApiKey = "5tiDiv3NI0U107lFfBdenGZNkdNElakAdFuCd3mQGW3S9IbI7gQNHLLLMFEfwy9h";
+//        String mainSecretKey = "TVPiuFyWkundIXJrXbce4TXwkhDWmoMm0xBe124ETr0rP8NK7yCrYL9ZqHnEK6Nn";
+//
+//        String otherMainApiKey = "5vQGewWTDLzz8HBvbmwYo0ahmqDCQtk8u82jlBwzGhScKiqepTgetao4m7OjCzBv";
+//        String otherMainSecretKey = "Az9dXjnwXPgxu7NmUyDx956DGltcKvvOYwqqLT6Ajcmu0VdSnBtonNRCIScbfGqz";
+//        String otherMainAccountAddress = "other_main_account_usdt_address";
+//
+//        SpotClient mainSpotClient = new SpotClientImpl(mainApiKey, mainSecretKey);
+//        SpotClient otherMainSpotClient = new SpotClientImpl(otherMainApiKey, otherMainSecretKey);
+//        Map param = new HashMap();
+//        param.put("recvWindow", 2000);
+//        param.put("omitZeroBalances", true);
+//        param.put("timestamp", System.currentTimeMillis());
+//        //获得交易设置
+//
+////        String s = mainSpotClient.createWallet().assetDetail(param);
+////        System.out.println("交易设置"+s);
+//        // 获取主账户USDT余额
+//        String mainAccountStr = mainSpotClient.createTrade().account(param);
+//        System.out.println(mainAccountStr);
+//        JSONObject mainAccount = JSONObject.parseObject(mainAccountStr);
+//        double mainUSDTBalance = getUSDTBalance(mainAccount);
+//        System.out.println("主账户USDT余额（转账前）： " + mainUSDTBalance);
+//
+//        Map otherparam = new HashMap();
+//        otherparam.put("recvWindow", 4000);
+//        otherparam.put("omitZeroBalances", true);
+//        otherparam.put("timestamp", System.currentTimeMillis());
+//        String otherAccountStr = otherMainSpotClient.createTrade().account(otherparam);
+//        System.out.println(otherAccountStr);
+//        JSONObject otherAccount = JSONObject.parseObject(otherAccountStr);
+//        double otherUSDTBalance = getUSDTBalance(otherAccount);
+//        System.out.println("其他USDT余额（转账前）： " + otherUSDTBalance);
+//
+//        Map add = new HashMap();
+//        add.put("coin", "USDT");
+//        add.put("network", "TRX");
+//
+//        String addressDetail = otherMainSpotClient.createWallet().depositAddress(add);
+//        JSONObject address = JSONObject.parseObject(addressDetail);
+//        System.out.println("miaoyan账户充值地址： " + addressDetail);
+////        LinkedHashMap<String, Object> depositParams = new LinkedHashMap<>();
+////        depositParams.put("coin", "USDT"); // 指定币种
+////        String depositAddress = client.createWallet().depositAddress(depositParams);
+////        JSONObject jsonObject = JSON.parseObject(depositAddress);
+//
+//
+//        Map tradeParam = new HashMap();
+//        tradeParam.put("coin", address.getString("coin"));
+//        tradeParam.put("address", address.getString("address"));
+//        tradeParam.put("network", "TRX");
+//        tradeParam.put("amount", "0.001");
+//        tradeParam.put("transactionFeeFlag", true);
+////        // 向另一个主账户转账20 USDT
+////         String drawdetail=mainSpotClient.createWallet().withdraw(tradeParam);
+////         System.out.println("转账详情"+drawdetail);
+//
+//
+//        Map detailParam = new HashMap();
+////        detailParam.put("coin", "USDT");
+////        detailParam.put("withdrawOrderId", "73fe9b56490740578f8bd7e62a35e1ef");
+////        detailParam.put("status", 0);
+//        detailParam.put("idList", "73fe9b56490740578f8bd7e62a35e1ef");
+//
+//
+//        String detail = mainSpotClient.createWallet().withdrawHistory(detailParam);
+//
+//        System.out.println("订单详情  " + detail);
+//
+//
+//    }
 
 
 }
