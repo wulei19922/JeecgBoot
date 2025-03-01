@@ -639,6 +639,28 @@ public class SysUserController {
 		return sysUserService.resetPassword(username,oldpassword,password,confirmpassword);
 	}
 
+    @RequestMapping(value = "/updatePasswordmy", method = RequestMethod.POST)
+    public Result<?> updatePasswordMy(@RequestBody JSONObject json) {
+//        String username = json.getString("username");
+        String oldpassword = json.getString("oldpassword");
+        String password = json.getString("password");
+        String confirmpassword = json.getString("againPwd");
+        LoginUser sysUser = (LoginUser)SecurityUtils.getSubject().getPrincipal();
+        String username =sysUser.getUsername();
+//        if(!sysUser.getUsername().equals(username)){
+//            return Result.error("只允许修改自己的密码！");
+//        }
+        SysUser user = this.sysUserService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username));
+        if(user==null) {
+            return Result.error("用户不存在！");
+        }
+        //update-begin---author:wangshuai ---date:20220316  for：[VUEN-234]修改密码添加敏感日志------------
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        baseCommonService.addLog("修改密码，username： " +loginUser.getUsername() ,CommonConstant.LOG_TYPE_2, 2);
+        //update-end---author:wangshuai ---date:20220316  for：[VUEN-234]修改密码添加敏感日志------------
+        return sysUserService.resetPassword(username,oldpassword,password,confirmpassword);
+    }
+
     @RequestMapping(value = "/userRoleList", method = RequestMethod.GET)
     public Result<IPage<SysUser>> userRoleList(@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                                @RequestParam(name="pageSize", defaultValue="10") Integer pageSize, HttpServletRequest req) {
