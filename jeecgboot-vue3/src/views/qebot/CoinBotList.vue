@@ -4,17 +4,26 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'qe:coin_bot:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button type="primary" v-auth="'qe:coin_bot:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
+        <a-button type="primary" v-auth="'qe:coin_bot:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
+        <a-button type="primary" v-auth="'qe:coin_bot:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出 </a-button>
         <j-upload-button type="primary" v-auth="'qe:coin_bot:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
-          >导入</j-upload-button
-        >
+          >导入
+        </j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
-              <a-menu-item key="1" @click="batchHandleStartOrStop('start')"> <Icon icon="ant-design:delete-outlined" />启动机器人 </a-menu-item>
-              <a-menu-item key="1" @click="batchHandleStartOrStop('stop')"> <Icon icon="ant-design:delete-outlined" />停止机器人(平仓) </a-menu-item>
-              <a-menu-item key="1" @click="batchHandleDelete"> <Icon icon="ant-design:delete-outlined" />删除 </a-menu-item>
+              <a-menu-item key="1" @click="batchHandleStartOrStop('start')">
+                <Icon icon="ant-design:delete-outlined" />
+                启动机器人
+              </a-menu-item>
+              <a-menu-item key="1" @click="batchHandleStartOrStop('stop')">
+                <Icon icon="ant-design:delete-outlined" />
+                停止机器人(平仓)
+              </a-menu-item>
+              <a-menu-item key="1" @click="batchHandleDelete">
+                <Icon icon="ant-design:delete-outlined" />
+                删除
+              </a-menu-item>
             </a-menu>
           </template>
           <a-button v-auth="'qe:coin_bot:deleteBatch'"
@@ -30,7 +39,7 @@
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
       <!--字段回显插槽-->
-      <template #bodyCell="{ column, record, index, text }"> </template>
+      <template #bodyCell="{ column, record, index, text }"></template>
     </BasicTable>
     <!-- 表单区域 -->
     <CoinBotModal @register="registerModal" @success="handleSuccess" />
@@ -38,47 +47,17 @@
     <div>
       <a-modal v-model:open="open" width="100%" wrap-class-name="full-modal" title="机器人参数" @ok="handleOk">
         <a-row>
-          <a-col :span="8">
+          <a-col :span="8" style="margin-right: 10px">
             <span>网格参数</span>
-            <a-table :columns="gridColumns" :data-source="currentBot" :pagination="false" @resize-column="handleResizeColumn">
-            </a-table>
+            <a-table :columns="gridColumns" :data-source="currentBot" :pagination="false" />
           </a-col>
-          <a-col :span="16">
+          <a-col :span="15">
             <span>匹配订单</span>
-            <a-table :columns="orderColumns" :data-source="currentOrder" :pagination="false" @resize-column="handleResizeColumn">
-              <template #headerCell="{ column }">
-                <template v-if="column.key === 'buy_order_num'">
-                  <span>
-                    <smile-outlined />
-                    买入数量
-                  </span>
-                </template>
-              </template>
-
+            <a-table :columns="orderColumns" @change="handleChange" :pagination="pagination" :data-source="currentOrder">
               <template #bodyCell="{ column, record }">
-                <template v-if="column.key === 'buy_price'">
-                  <a>
-                    {{ record.buy_price }}
-                  </a>
-                </template>
-                <template v-else-if="column.key === 'tags'">
-                  <span>
-                    <a-tag v-for="tag in record.tags" :key="tag" :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'">
-                      {{ tag.toUpperCase() }}
-                    </a-tag>
-                  </span>
-                </template>
-                <template v-else-if="column.key === 'action'">
-                  <span>
-                    <a>Invite 一 {{ record.name }}</a>
-                    <a-divider type="vertical" />
-                    <a>Delete</a>
-                    <a-divider type="vertical" />
-                    <a class="ant-dropdown-link">
-                      More actions
-                      <down-outlined />
-                    </a>
-                  </span>
+                <template v-if="column.dataIndex === 'silder'">
+                  <a v-if="record[column.dataIndex] === 'SELL'" style="color: red"> 卖 </a>
+                  <a v-else-if="record[column.dataIndex] === 'BUY'" style="color: green"> 买 </a>
                 </template>
               </template>
             </a-table>
@@ -99,11 +78,12 @@
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, batchOperate } from './CoinBot.api';
   import { list as orderList } from '../coinOrder/CoinOrder.api';
 
-  import { downloadFile } from '/@/utils/common/renderUtils';
+  import { downloadFile, render } from '/@/utils/common/renderUtils';
   import { useUserStore } from '/@/store/modules/user';
   import msg from '@/views/demo/feat/msg/index.vue';
   import { TableColumnsType } from 'ant-design-vue';
-  import HeadInfo from "@/components/chart/HeadInfo.vue";
+  import HeadInfo from '@/components/chart/HeadInfo.vue';
+
   const queryParam = reactive<any>({});
   const checkedKeys = ref<Array<string | number>>([]);
   const userStore = useUserStore();
@@ -167,6 +147,12 @@
       dataIndex: 'buy_price',
       key: 'buy_price',
       maxWidth: 50,
+      customRender: ({ text }) => {
+        if (text) {
+          return parseFloat(text).toFixed(6);
+        }
+        return text;
+      },
     },
     {
       title: '卖出订单',
@@ -178,10 +164,21 @@
       title: '卖出价格',
       key: 'sell_price',
       dataIndex: 'sell_price',
+      customRender: ({ text }) => {
+        if (text) {
+          return parseFloat(text).toFixed(6);
+        }
+        return text;
+      },
       maxWidth: 50,
     },
   ]);
   const orderColumns = ref<TableColumnsType>([
+    {
+      title: '创建时间',
+      align: 'center',
+      dataIndex: 'createTime',
+    },
     {
       title: '方向',
       align: 'center',
@@ -195,6 +192,12 @@
     {
       title: '	成交均价',
       align: 'center',
+      customRender: ({ text }) => {
+        if (text) {
+          return parseFloat(text).toFixed(6);
+        }
+        return text;
+      },
       dataIndex: 'avgPrice',
     },
     {
@@ -205,6 +208,12 @@
     {
       title: '成交价格',
       align: 'center',
+      customRender: ({ text }) => {
+        if (text) {
+          return parseFloat(text).toFixed(6);
+        }
+        return text;
+      },
       dataIndex: 'price',
     },
     // {
@@ -217,11 +226,11 @@
       align: 'center',
       dataIndex: 'status_dictText',
     },
-    {
-      title: '币安订单ID',
-      align: 'center',
-      dataIndex: 'orderId',
-    },
+    // {
+    //   title: '币安订单ID',
+    //   align: 'center',
+    //   dataIndex: 'orderId',
+    // },
     {
       title: '交易对',
       align: 'center',
@@ -242,17 +251,24 @@
   const open = ref<boolean>(false);
   const currentBot = ref<Object>(false);
   const currentOrder = ref<Object>(false);
+  const params = ref<Object>({
+    column: 'createTime',
+    order: 'desc',
+    pageNo: 1,
+    pageSize: 10,
+    botId: '1895698783372677121_dogeusdt_BINANCE_spot_gride',
+  });
+  const pagination = ref<Object>({ total: 10, current: 1, pageSize: 10 });
   const showBuyModal = (record) => {
     currentBot.value = JSON.parse(record.gridConfig);
-    let params = {
-      column: 'createTime',
-      order: 'desc',
-      pageNo: 1,
-      pageSize: 10,
-      botId: '1895698783372677121_dogeusdt_BINANCE_spot_gride',
-    };
+
     //请求匹配订单
-    orderList(params).then((res) => {
+    params.value['botId'] = record['instanceName'];
+    orderList(params.value).then((res) => {
+      console.log(res);
+      pagination.value.total = res.total;
+      pagination.value.current = res.current;
+      pagination.value.pageSize = res.size;
       currentOrder.value = res.records;
     });
     console.log(currentBot.value);
@@ -264,6 +280,19 @@
     open.value = false;
   };
 
+  const handleChange = (data) => {
+    console.log('tablechange', data);
+    params.value['pageNo'] = data.current;
+    params.value['pageSize'] = data.pageSize;
+    orderList(params.value).then((res) => {
+      pagination.value.total = res.total;
+      pagination.value.current = res.current;
+      pagination.value.pageSize = res.size;
+      console.log(pagination.value);
+      currentOrder.value = res.records;
+    });
+  };
+
   /*
    * 高级查询事件
    */
@@ -273,6 +302,7 @@
     });
     reload();
   }
+
   /**
    * 新增事件
    */
@@ -282,6 +312,7 @@
       showFooter: true,
     });
   }
+
   /**
    * 编辑事件
    */
@@ -292,6 +323,7 @@
       showFooter: true,
     });
   }
+
   /**
    * 详情
    */
@@ -302,12 +334,14 @@
       showFooter: false,
     });
   }
+
   /**
    * 删除事件
    */
   async function handleDelete(record) {
     await deleteOne({ id: record.id }, handleSuccess);
   }
+
   /**
    * 批量删除事件
    */
@@ -330,12 +364,14 @@
 
     await batchOperate({ ids: selectedRowKeys.value, message: msg, type: message }, handleSuccess);
   }
+
   /**
    * 成功回调
    */
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
   }
+
   /**
    * 操作栏
    */
@@ -348,6 +384,7 @@
       },
     ];
   }
+
   /**
    * 下拉操作栏
    */
