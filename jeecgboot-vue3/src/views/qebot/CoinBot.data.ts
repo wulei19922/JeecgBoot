@@ -23,7 +23,7 @@ export const columns: BasicColumn[] = [
   {
     title: '类型',
     align: 'center',
-    dataIndex: 'type',
+    dataIndex: 'type_dictText',
   },
   {
     title: '开启状态',
@@ -173,7 +173,10 @@ export const searchFormSchema: FormSchema[] = [
   {
     label: '类型',
     field: 'type',
-    component: 'Input',
+    component: 'JSelectMultiple',
+    componentProps: {
+      dictCode: 'exchange',
+    },
     //colProps: {span: 6},
   },
   {
@@ -218,7 +221,10 @@ export const formSchema: FormSchema[] = [
   {
     label: '类型',
     field: 'type',
-    component: 'Input',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'exchange',
+    },
   },
   {
     label: '开启状态',
@@ -377,7 +383,7 @@ export const superQuerySchema = {
   categoryType: { title: '算法类型', order: 0, view: 'list', type: 'string', dictCode: 'qe_bot_type' },
   memberId: { title: '用户', order: 1, view: 'sel_search', type: 'string', dictTable: 'sys_user', dictCode: 'id', dictText: 'username' },
   status: { title: '当前状态', order: 2, view: 'list', type: 'string', dictCode: 'bot_status' },
-  type: { title: '类型', order: 3, view: 'text', type: 'string' },
+  type: { title: '类型', order: 3, view: 'list', type: 'string', dictCode: 'exchange' },
   openStatus: { title: '开启状态', order: 4, view: 'number', type: 'number', dictCode: 'qot_status' },
   totalInvest: { title: '总投资额', order: 5, view: 'number', type: 'number' },
   symbol: { title: '交易对', order: 6, view: 'list', type: 'string', dictTable: 'coin_support', dictCode: 'symbol', dictText: 'symbol' },
