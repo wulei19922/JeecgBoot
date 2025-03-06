@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * @Description: 量化机器人订单
  * @Author: jeecg-boot
- * @Date:   2025-03-01
+ * @Date:   2025-03-06
  * @Version: V1.0
  */
 @Data
@@ -68,7 +68,7 @@ public class CoinOrder implements Serializable {
 	/**成交数量*/
 	@Excel(name = "成交数量", width = 15)
     @ApiModelProperty(value = "成交数量")
-    private Integer num;
+    private Double num;
 	/**成交价格*/
 	@Excel(name = "成交价格", width = 15)
     @ApiModelProperty(value = "成交价格")
