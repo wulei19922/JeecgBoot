@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * @Description: 机器人列表
  * @Author: jeecg-boot
- * @Date:   2025-02-23
+ * @Date:   2025-03-06
  * @Version: V1.0
  */
 @Data
@@ -58,7 +58,8 @@ public class CoinBot implements Serializable {
     @ApiModelProperty(value = "当前状态")
     private String status;
 	/**类型*/
-	@Excel(name = "类型", width = 15)
+	@Excel(name = "类型", width = 15, dicCode = "exchange")
+	@Dict(dicCode = "exchange")
     @ApiModelProperty(value = "类型")
     private String type;
 	/**开启状态*/
@@ -106,7 +107,7 @@ public class CoinBot implements Serializable {
 	/**单次交易数量*/
 	@Excel(name = "单次交易数量", width = 15)
     @ApiModelProperty(value = "单次交易数量")
-    private Integer perOrder;
+    private Double perOrder;
 	/**机器人节点机器*/
 	@Excel(name = "机器人节点机器", width = 15)
     @ApiModelProperty(value = "机器人节点机器")
@@ -124,7 +125,8 @@ public class CoinBot implements Serializable {
     @ApiModelProperty(value = "单网格利润率")
     private Double grideProfit;
 	/**环境*/
-	@Excel(name = "环境", width = 15)
+	@Excel(name = "环境", width = 15, dicCode = "env")
+	@Dict(dicCode = "env")
     @ApiModelProperty(value = "环境")
     private String env;
 	/**持仓*/
