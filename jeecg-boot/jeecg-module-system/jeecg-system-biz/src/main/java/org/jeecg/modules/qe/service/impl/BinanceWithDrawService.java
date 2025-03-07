@@ -229,6 +229,13 @@ public class BinanceWithDrawService {
         return 0.0;
     }
 
+    public boolean payList(String ids) {
+
+
+
+        return  true;
+    }
+
 //    public static void main(String[] args) {
 //
 //        String mainApiKey = "5tiDiv3NI0U107lFfBdenGZNkdNElakAdFuCd3mQGW3S9IbI7gQNHLLLMFEfwy9h";
