@@ -223,9 +223,9 @@ public class CoinKeysController extends JeecgController<CoinKeys, ICoinKeysServi
 		 //**教研key是否有效
 		 //检查是否初始化用户钱包
 		 CoinWallet coinWallet = binanceWithDrawService.getCoinWallet(sysUser.getId());
-
-
 		 Double  free = binanceWithDrawService.getWallet(sysUser.getId(),"BINANCE",coinKeys.getApiKey(),coinKeys.getApiSecret());
+		 String uid  = binanceWithDrawService.getUid(sysUser.getId(),"BINANCE",coinKeys.getApiKey(),coinKeys.getApiSecret());
+		 String address  = binanceWithDrawService.getChargeAddress(coinKeys.getApiKey(),coinKeys.getApiSecret());
 
 		 if (free>=0D){
 			 if (coinWallet!=null){
@@ -252,6 +252,8 @@ public class CoinKeysController extends JeecgController<CoinKeys, ICoinKeysServi
 					 coinKeys.setApiKey(null);
 					 coinKeys.setApiSecret(null);
 				 }
+				 coinKeys.setUid(uid);
+				 coinKeys.setAddress(address);
 				 coinKeysService.updateById(coinKeys);
 			 }else{
 				 coinKeys.setEnv("prod");
@@ -259,6 +261,7 @@ public class CoinKeysController extends JeecgController<CoinKeys, ICoinKeysServi
 				 coinKeys.setCreateTime(new Date());
 				 coinKeys.setMemberId(sysUser.getId());
 				 coinKeys.setCreateBy(sysUser.getUsername());
+				 coinKeys.setUid(uid);
 				 coinKeysService.save(coinKeys);
 			 }
 

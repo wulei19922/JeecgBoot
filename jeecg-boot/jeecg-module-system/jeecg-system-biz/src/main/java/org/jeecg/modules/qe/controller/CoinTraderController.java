@@ -138,6 +138,7 @@ public class CoinTraderController extends JeecgController<CoinTrader, ICoinTrade
 		boolean payres=withDrawService.payList(ids);
 		return Result.OK("批量支付成功!");
 	}
+
 	
 	/**
 	 * 通过id查询

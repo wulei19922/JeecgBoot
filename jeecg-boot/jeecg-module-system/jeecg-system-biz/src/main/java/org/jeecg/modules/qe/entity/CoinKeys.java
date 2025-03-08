@@ -17,16 +17,16 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: 用户平台个人信息
+ * @Description: 用户核心信息
  * @Author: jeecg-boot
- * @Date:   2025-02-27
+ * @Date:   2025-03-08
  * @Version: V1.0
  */
 @Data
 @TableName("coin_keys")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="coin_keys对象", description="用户平台个人信息")
+@ApiModel(value="coin_keys对象", description="用户核心信息")
 public class CoinKeys implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -89,4 +89,12 @@ public class CoinKeys implements Serializable {
 	@Excel(name = "资金密码", width = 15)
     @ApiModelProperty(value = "资金密码")
     private String fundPwd;
+	/**交易所账户ID*/
+	@Excel(name = "交易所账户ID", width = 15)
+    @ApiModelProperty(value = "交易所账户ID")
+    private String uid;
+	/**钱包地址*/
+	@Excel(name = "钱包地址", width = 15)
+    @ApiModelProperty(value = "钱包地址")
+    private String address;
 }

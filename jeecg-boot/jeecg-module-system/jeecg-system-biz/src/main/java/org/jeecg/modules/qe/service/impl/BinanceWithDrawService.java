@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.binance.connector.client.SpotClient;
 import com.binance.connector.client.impl.SpotClientImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,9 @@ public class BinanceWithDrawService {
     @Autowired
     CoinFundsChangeMapper coinFundsChangeMapper;
 
+    @Autowired
+    CoinTraderServiceImpl coinTraderService;
+
 
 
     //获得财务收款账号地址
@@ -70,6 +74,21 @@ public class BinanceWithDrawService {
         }catch (Exception e ){
             log.info("当前key不合法",e);
             return -99d;
+        }
+    }
+   public String  getUid(String id,String type,String key,String secret) {
+        try {
+            String mainApiKey = key;
+            String mainSecretKey = secret;
+            LinkedHashMap<String, Object> parameters = new LinkedHashMap<>();
+            SpotClient mainSpotClient = new SpotClientImpl(mainApiKey, mainSecretKey);
+            String s = mainSpotClient.createTrade().account(parameters);
+            JSONObject jsonObject = JSONObject.parseObject(s);
+            String uid = jsonObject.getString("uid");
+            return uid;
+        }catch (Exception e ){
+            log.info("当前key不合法",e);
+            return "";
         }
     }
 
@@ -176,13 +195,12 @@ public class BinanceWithDrawService {
         return false;
     }
 
-    public ChargeAddress getChargeAddress(String id) {
+    public String  getChargeAddress(String key,String secret) {
         String baseUrl = "";
-        CoinKeys coinKeys = getKeysCoinConfig(id);
         baseUrl = "https://api.binance.com";
         // 替换为你的API密钥和私钥
-        String apiKey = coinKeys.getApiKey();
-        String secretKey = coinKeys.getApiSecret();
+        String apiKey = key;
+        String secretKey = secret;
 
         // 创建SpotClient实例
         SpotClient client = new SpotClientImpl(apiKey, secretKey, baseUrl);
@@ -190,22 +208,14 @@ public class BinanceWithDrawService {
         // 设置请求参数
         LinkedHashMap<String, Object> parameters = new LinkedHashMap<>();
         parameters.put("coin", "USDT"); // 替换为需要的币种
-
         try {
-
             // （可选）尝试生成存款地址，指定币种（如 BTC）
             LinkedHashMap<String, Object> depositParams = new LinkedHashMap<>();
             depositParams.put("coin", "USDT"); // 指定币种
             String depositAddress = client.createWallet().depositAddress(depositParams);
             JSONObject jsonObject = JSON.parseObject(depositAddress);
 
-
-//            System.out.println("充值地址: " + address);
-            ChargeAddress ad = new ChargeAddress();
-            ad.setAddress(jsonObject.getString("address"));
-            ad.setCoin("USDT");
-            ad.setUrl(jsonObject.getString("url"));
-            return ad;
+            return jsonObject.getString("address");
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -231,6 +241,12 @@ public class BinanceWithDrawService {
 
     public boolean payList(String ids) {
 
+        UpdateWrapper updateWrapper=new UpdateWrapper();
+        updateWrapper.set("status","paying");
+        updateWrapper.in("id",ids.split(","));
+        updateWrapper.eq("status","pay_no");
+
+        coinTraderService.update(updateWrapper);
 
 
         return  true;
