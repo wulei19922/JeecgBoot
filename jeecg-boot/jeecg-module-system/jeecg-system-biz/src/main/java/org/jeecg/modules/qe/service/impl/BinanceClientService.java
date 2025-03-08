@@ -138,6 +138,7 @@ public class BinanceClientService {
             ChargeAddress ad = new ChargeAddress();
             ad.setAddress(jsonObject.getString("address"));
             ad.setCoin("USDT");
+            ad.setUid(coinKeys.getUid());
             ad.setUrl(jsonObject.getString("url"));
             return ad;
         } catch (Exception e) {

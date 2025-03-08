@@ -23,5 +23,8 @@ public class ChargeAddress {
     @ApiModelProperty("url")
     private String url;
 
+    @ApiModelProperty("url")
+    private String uid;
+
 
 }
