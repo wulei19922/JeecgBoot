@@ -104,9 +104,10 @@ public class MarketVouchersController {
 		// 先初始化规则模板
 		// 1 查询模板
 		// 2 根据模板生成数据
-		VouchersWechat templateWechat = wechatService.getById("1900081885311062018");
+		VouchersWechat templateWechat = wechatService.getById("1900090936140922882");
 		templateWechat.setId("");
 		templateWechat.setStockName(marketVouchersPage.getName());
+		templateWechat.setComment(marketVouchersPage.getRemark());
 		wechatService.save(templateWechat);
 
 		MarketVouchers marketVouchers = new MarketVouchers();

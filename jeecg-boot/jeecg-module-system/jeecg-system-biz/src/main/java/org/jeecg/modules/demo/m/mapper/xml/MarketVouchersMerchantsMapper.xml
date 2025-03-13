@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.demo.m.mapper.MarketVouchersMerchantsMapper">
+
+	<delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE 
+		FROM  market_vouchers_merchants 
+		WHERE
+			 haed_id = #{mainId} 	</delete>
+	
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.jeecg.modules.demo.m.entity.MarketVouchersMerchants">
+		SELECT * 
+		FROM  market_vouchers_merchants
+		WHERE
+			 haed_id = #{mainId} 	</select>
+</mapper>

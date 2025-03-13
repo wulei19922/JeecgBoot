@@ -1,0 +1,52 @@
+{
+  "stock_name": "浦发银行2025-03-NICK商家活动",
+  "comment": "测试批次",
+  "belong_merchant": "1708581355",
+  "available_begin_time": "2025-03-13T01:10:27.218+08:00",
+  "available_end_time": "2025-03-14T01:10:27.218+08:00",
+  "stock_use_rule": {
+    "max_coupons": 100,
+    "max_amount": 50000,
+    "max_amount_by_day": 500,
+    "max_coupons_per_user": 1,
+    "natural_person_limit": true,
+    "prevent_api_abuse": true
+  },
+  "pattern_info": {
+    "description": "浦发银行卡专属福利",
+    "merchant_logo": "https://h5.runnongji.com/static/images/public/logo.png",
+    "merchant_name": "测试商户",
+    "background_color": "COLOR010",
+    "coupon_image": "https://h5.runnongji.com/static/images/public/logo.png"
+  },
+  "coupon_use_rule": {
+    "coupon_available_time": {
+      "fix_available_time": {
+        "available_week_day": [
+          1
+        ],
+        "begin_time": 0,
+        "end_time": 3600
+      },
+      "second_day_available": false,
+      "available_time_after_receive": 7
+    },
+    "fixed_normal_coupon": {
+      "coupon_amount": 500,
+      "transaction_minimum": 500
+    },
+    "goods_tag": [
+      "1"
+    ],
+    "available_merchants": [
+      "1708581355"
+    ],
+    "limit_pay": [
+      "BCZ_DEBIT"
+    ]
+  },
+  "no_cash": false,
+  "stock_type": "NORMAL",
+  "out_request_no": "1708581355_202503112312_0000001",
+  "ext_info": ""
+}
