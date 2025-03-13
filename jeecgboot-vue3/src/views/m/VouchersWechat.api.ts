@@ -7,6 +7,7 @@ enum Api {
   list = '/m/vouchersWechat/list',
   save = '/m/vouchersWechat/add',
   edit = '/m/vouchersWechat/edit',
+  queryById = '/m/vouchersWechat/queryById',
   deleteOne = '/m/vouchersWechat/delete',
   deleteBatch = '/m/vouchersWechat/deleteBatch',
   importExcel = '/m/vouchersWechat/importExcel',
@@ -33,6 +34,14 @@ export const list = (params) => defHttp.get({ url: Api.list, params });
 export const deleteOne = (params, handleSuccess) => {
   return defHttp.delete({ url: Api.deleteOne, params }, { joinParamsToUrl: true }).then(() => {
     handleSuccess();
+  });
+};
+/**
+ * 根据ID查询详情
+ */
+export const queryById = (params, handleSuccess) => {
+  return defHttp.get({ url: Api.queryById, params }, { joinParamsToUrl: true }).then((res) => {
+    handleSuccess(res);
   });
 };
 /**

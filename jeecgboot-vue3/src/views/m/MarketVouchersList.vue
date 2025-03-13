@@ -34,7 +34,9 @@
       <template #bodyCell="{ column, record, index, text }"> </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <MarketVouchersModal @register="registerModal" @success="handleSuccess" />
+    <MarketVouchersModal @register="registerMarketModal" @success="handleSuccess" />
+    <!-- 微信优惠券配置 -->
+    <VouchersWechatModal @register="registerWechatModal" @success="handleSuccess" />
   </div>
 </template>
 
@@ -46,13 +48,17 @@
   import MarketVouchersModal from './components/MarketVouchersModal.vue';
   import { columns, searchFormSchema, superQuerySchema } from './MarketVouchers.data';
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './MarketVouchers.api';
+  import { queryById } from './VouchersWechat.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import { useUserStore } from '/@/store/modules/user';
+  import VouchersWechatModal from './components/VouchersWechatModal.vue';
   const queryParam = reactive<any>({});
   const checkedKeys = ref<Array<string | number>>([]);
   const userStore = useUserStore();
-  //注册model
-  const [registerModal, { openModal }] = useModal();
+  // 在 setup 脚本中修改
+  const [registerMarketModal, { openModal: openMarketModal }] = useModal();
+  const [registerWechatModal, { openModal: openWechatModal }] = useModal();
+
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -106,7 +112,7 @@
    * 新增事件
    */
   function handleAdd() {
-    openModal(true, {
+    openMarketModal(true, {
       isUpdate: false,
       showFooter: true,
     });
@@ -115,7 +121,7 @@
    * 编辑事件
    */
   function handleEdit(record: Recordable) {
-    openModal(true, {
+    openMarketModal(true, {
       record,
       isUpdate: true,
       showFooter: true,
@@ -125,7 +131,25 @@
    * 详情
    */
   function handleDetail(record: Recordable) {
-    openModal(true, {
+    openMarketModal(true, {
+      record,
+      isUpdate: true,
+      showFooter: false,
+    });
+  }
+
+  /**
+   * 配置优惠券规则
+   */
+  async function settingVouchers(record: Recordable) {
+    // 根据详情查询表名
+    await queryById({ id: record.settingId }, hanldeSettings);
+  }
+
+  function hanldeSettings(record) {
+    console.log('返回参数详细信息');
+    console.log(record);
+    openWechatModal(true, {
       record,
       isUpdate: true,
       showFooter: false,
@@ -169,7 +193,7 @@
     return [
       {
         label: '配置',
-        onClick: handleDetail.bind(null, record),
+        onClick: settingVouchers.bind(null, record),
       },
       {
         label: '激活',
