@@ -104,7 +104,7 @@ public class QuickStart {
 
         CouponRule couponUseRule=new CouponRule();
         List<String> availableMerchants=new ArrayList<>();
-        availableMerchants.add("98568865");
+        availableMerchants.add("1710701753");
         couponUseRule.setAvailableMerchants(availableMerchants);
         FixedValueStockMsg fixedValueStockMsg=new FixedValueStockMsg();
         fixedValueStockMsg.setCouponAmount(10L);
@@ -137,7 +137,7 @@ public class QuickStart {
         request.setCouponUseRule(couponUseRule);
 
 
-        request.setNoCash(false);
+        request.setNoCash(true);
         request.setStockType("NORMAL");
 
         request.setOutRequestNo("1708581355_202503112312_0000001");
