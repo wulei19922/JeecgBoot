@@ -184,7 +184,7 @@ public class CoinCustomController {
     @GetMapping(value = "/top/list")
     public Result<List<TickerResutl>> getTopData() {
 
-        List<TickerResutl> list = binanceClientService.getList(true);
+        List<TickerResutl> list = binanceClientService.getTopList(true);
 
         return Result.OK(list);
     }
@@ -209,7 +209,7 @@ public class CoinCustomController {
     public Result<ChargeAddress> getAddress() {
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 
-        ChargeAddress address = binanceClientService.getChargeAddress(sysUser.getId());
+        ChargeAddress address = binanceClientService.getChargeAddress("1895040445819490305");
 
 
         return Result.OK(address);

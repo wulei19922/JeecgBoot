@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.jeecg.common.aspect.annotation.Dict;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -18,7 +19,7 @@ import java.util.Date;
 /**
  * @Description: 支持的两户货币
  * @Author: jeecg-boot
- * @Date:   2025-02-16
+ * @Date:   2025-03-18
  * @Version: V1.0
  */
 @Data
@@ -57,11 +58,21 @@ public class CoinSupport implements Serializable {
     @ApiModelProperty(value = "交易对")
     private String symbol;
 	/**平台*/
-	@Excel(name = "平台", width = 15)
+	@Excel(name = "平台", width = 15, dicCode = "exchange")
+	@Dict(dicCode = "exchange")
     @ApiModelProperty(value = "平台")
     private String platform;
 	/**货币图标*/
 	@Excel(name = "货币图标", width = 15)
     @ApiModelProperty(value = "货币图标")
     private String icourl;
+	/**置顶开关*/
+    @Excel(name = "置顶开关", width = 15,replace = {"是_Y","否_N"} )
+    @ApiModelProperty(value = "置顶开关")
+    private String up;
+	/**交易类型*/
+	@Excel(name = "交易类型", width = 15, dicCode = "symbol_trade_type")
+	@Dict(dicCode = "symbol_trade_type")
+    @ApiModelProperty(value = "交易类型")
+    private String tradeType;
 }

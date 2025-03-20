@@ -35,6 +35,67 @@ public class BinanceClientService {
     RedisUtil redisUtil;
 
 
+    public List<TickerResutl> getTopList(boolean isUp) {
+
+//        if(redisUtil.hasKey("QUETO_TOP")){
+//            String result= redisUtil.get("QUETO_TOP").toString();
+//            List<TickerResutl> tickerResutls = JSON.parseArray(result, TickerResutl.class);
+//            return  tickerResutls;
+//        }
+
+        QueryWrapper<CoinSupport> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("up", "Y");
+        queryWrapper.eq("trade_type", "SPOT");
+
+
+        List<CoinSupport> supportsList = coinSupportService.list(queryWrapper);
+        ArrayList symbols = new ArrayList();
+
+        supportsList.stream().forEach(t -> {
+
+            t.setSymbol(t.getSymbol().toUpperCase(Locale.ROOT));
+            symbols.add(t.getSymbol());
+        });
+        // 初始化客户端（这里使用公开数据不需要API密钥）
+        SpotClientImpl client = new SpotClientImpl();
+        List<TickerResutl> result = supportsList.stream().map(t -> {
+            TickerResutl tickerResutl = new TickerResutl();
+            tickerResutl.setBaseCoin(t.getSymbol());
+            tickerResutl.setIcon(t.getIcourl());
+            return tickerResutl;
+
+        }).collect(Collectors.toList());
+
+        Map symbolParams = new HashMap<>();
+        symbolParams.put("symbols", symbols);
+        String priceResult = client.createMarket().ticker(symbolParams);
+        JSONArray currentPrices = JSON.parseArray(priceResult);
+        currentPrices.stream().forEach(
+                t -> {
+                    JSONObject one = JSON.parseObject(t.toString());
+                    TickerResutl rone = result.stream().filter(r -> r.getBaseCoin().equals(one.getString("symbol"))).findFirst().get();
+                    rone.setPriceUsd(one.getFloat("lastPrice"));
+                    rone.setOpen(one.getFloat("openPrice"));
+                    rone.setClose(one.getFloat("lastPrice"));
+                    rone.setVol(one.getFloat("volume"));
+                }
+        );
+
+        symbolParams.put("symbols", symbols);
+        String ticker24hResult = client.createMarket().ticker24H(symbolParams);
+        JSONArray h24Prices = JSON.parseArray(ticker24hResult);
+        h24Prices.stream().forEach(
+                t -> {
+                    JSONObject one = JSON.parseObject(t.toString());
+                    TickerResutl rone = result.stream().filter(r -> r.getBaseCoin().equals(one.getString("symbol"))).findFirst().get();
+                    rone.setChange24Hours(one.getFloat("priceChange"));
+                }
+        );
+        redisUtil.set("QUETO_TOP",JSON.toJSON(result),2000);
+        return result;
+    }
+
+
     public List<TickerResutl> getList(boolean isUp) {
 
         if(redisUtil.hasKey("QUETO")){
