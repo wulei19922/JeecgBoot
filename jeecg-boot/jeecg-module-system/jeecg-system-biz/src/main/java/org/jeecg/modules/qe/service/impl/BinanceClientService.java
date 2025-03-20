@@ -37,11 +37,11 @@ public class BinanceClientService {
 
     public List<TickerResutl> getTopList(boolean isUp) {
 
-//        if(redisUtil.hasKey("QUETO_TOP")){
-//            String result= redisUtil.get("QUETO_TOP").toString();
-//            List<TickerResutl> tickerResutls = JSON.parseArray(result, TickerResutl.class);
-//            return  tickerResutls;
-//        }
+        if(redisUtil.hasKey("QUETO_TOP")){
+            String result= redisUtil.get("QUETO_TOP").toString();
+            List<TickerResutl> tickerResutls = JSON.parseArray(result, TickerResutl.class);
+            return  tickerResutls;
+        }
 
         QueryWrapper<CoinSupport> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("up", "Y");
