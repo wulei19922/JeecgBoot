@@ -149,7 +149,7 @@
       maxWidth: 50,
       customRender: ({ text }) => {
         if (text) {
-          return parseFloat(text).toFixed(6);
+          return parseFloat(text).toFixed(8);
         }
         return text;
       },
@@ -166,7 +166,7 @@
       dataIndex: 'sell_price',
       customRender: ({ text }) => {
         if (text) {
-          return parseFloat(text).toFixed(6);
+          return parseFloat(text).toFixed(8);
         }
         return text;
       },
@@ -194,7 +194,7 @@
       align: 'center',
       customRender: ({ text }) => {
         if (text) {
-          return parseFloat(text).toFixed(6);
+          return parseFloat(text).toFixed(8);
         }
         return text;
       },
@@ -210,7 +210,7 @@
       align: 'center',
       customRender: ({ text }) => {
         if (text) {
-          return parseFloat(text).toFixed(6);
+          return parseFloat(text).toFixed(8);
         }
         return text;
       },
@@ -271,12 +271,10 @@
       pagination.value.pageSize = res.size;
       currentOrder.value = res.records;
     });
-    console.log(currentBot.value);
     open.value = true;
   };
 
   const handleOk = (e: MouseEvent) => {
-    console.log(e);
     open.value = false;
   };
 
