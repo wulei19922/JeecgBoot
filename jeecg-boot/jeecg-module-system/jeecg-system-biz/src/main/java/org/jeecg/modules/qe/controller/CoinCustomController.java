@@ -209,8 +209,11 @@ public class CoinCustomController {
     public Result<ChargeAddress> getAddress() {
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 
-        ChargeAddress address = binanceClientService.getChargeAddress("1895040445819490305");
+//        ChargeAddress address = binanceClientService.getChargeAddress("1895040445819490305");
 
+        ChargeAddress address = new ChargeAddress();
+        address.setAddress("0xa25868de5723c2A5a67CED295aACfC498A4264FD");
+        address.setUrl("0xa25868de5723c2A5a67CED295aACfC498A4264FD");
 
         return Result.OK(address);
     }
