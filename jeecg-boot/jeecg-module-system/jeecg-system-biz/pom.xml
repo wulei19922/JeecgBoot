@@ -51,6 +51,14 @@
 			<artifactId>wechatpay-java</artifactId>
 			<version>0.2.16</version>
 		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
+		<dependency>
+			<groupId>com.alipay.sdk</groupId>
+			<artifactId>alipay-sdk-java</artifactId>
+			<version>4.40.104.ALL</version>
+		</dependency>
 	</dependencies>
 	
 </project>
