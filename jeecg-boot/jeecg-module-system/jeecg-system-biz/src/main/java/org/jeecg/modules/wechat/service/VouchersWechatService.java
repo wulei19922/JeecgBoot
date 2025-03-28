@@ -2,7 +2,7 @@ package org.jeecg.modules.wechat.service;
 
 import com.alibaba.fastjson.JSONObject;
 
-public interface VouchersService {
+public interface VouchersWechatService {
 
 
 

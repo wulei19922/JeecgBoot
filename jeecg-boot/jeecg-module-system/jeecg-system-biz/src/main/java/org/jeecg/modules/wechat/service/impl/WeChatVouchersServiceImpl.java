@@ -5,7 +5,7 @@ import com.wechat.pay.java.core.Config;
 import com.wechat.pay.java.core.RSAAutoCertificateConfig;
 import com.wechat.pay.java.service.cashcoupons.CashCouponsService;
 import com.wechat.pay.java.service.cashcoupons.model.*;
-import org.jeecg.modules.wechat.service.VouchersService;
+import org.jeecg.modules.wechat.service.VouchersWechatService;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @Service("wechat")
-public class WeChatVouchersServiceImpl implements VouchersService {
+public class WeChatVouchersServiceImpl implements VouchersWechatService {
 
     public static String merchantId = "1708581355";
 
@@ -126,26 +126,90 @@ public class WeChatVouchersServiceImpl implements VouchersService {
 
     @Override
     public JSONObject startStock(JSONObject params) {
+
+        Config config =
+                new RSAAutoCertificateConfig.Builder()
+                        .merchantId(merchantId)
+                        .privateKeyFromPath(privateKeyPath)
+                        .merchantSerialNumber(merchantSerialNumber)
+                        .apiV3Key(apiV3Key)
+                        .build();
+        CashCouponsService cashCouponsService = new CashCouponsService.Builder().config(config).build();
+        StartStockRequest startStockRequest=new StartStockRequest();
+        startStockRequest.setStockId("1708581355_202503112312_0000001");
+        startStockRequest.setStockCreatorMchid("1708581355");
+        cashCouponsService.startStock(startStockRequest);
         return null;
     }
 
     @Override
     public JSONObject stopStock(JSONObject params) {
+
+        Config config =
+                new RSAAutoCertificateConfig.Builder()
+                        .merchantId(merchantId)
+                        .privateKeyFromPath(privateKeyPath)
+                        .merchantSerialNumber(merchantSerialNumber)
+                        .apiV3Key(apiV3Key)
+                        .build();
+        CashCouponsService cashCouponsService = new CashCouponsService.Builder().config(config).build();
+       StopStockRequest stopStockRequest=new StopStockRequest();
+        stopStockRequest.setStockId("1708581355_202503112312_0000001");
+        stopStockRequest.setStockCreatorMchid("1708581355");
+        cashCouponsService.stopStock(stopStockRequest);
+
         return null;
     }
 
     @Override
     public JSONObject restartStock(JSONObject params) {
+
+        Config config =
+                new RSAAutoCertificateConfig.Builder()
+                        .merchantId(merchantId)
+                        .privateKeyFromPath(privateKeyPath)
+                        .merchantSerialNumber(merchantSerialNumber)
+                        .apiV3Key(apiV3Key)
+                        .build();
+        CashCouponsService cashCouponsService = new CashCouponsService.Builder().config(config).build();
+        RestartStockRequest restartStockRequest=new RestartStockRequest();
+        restartStockRequest.setStockId("1708581355_202503112312_0000001");
+        restartStockRequest.setStockCreatorMchid("1708581355");
+        cashCouponsService.restartStock(restartStockRequest);
         return null;
     }
 
     @Override
     public JSONObject listStock(JSONObject params) {
+        Config config =
+                new RSAAutoCertificateConfig.Builder()
+                        .merchantId(merchantId)
+                        .privateKeyFromPath(privateKeyPath)
+                        .merchantSerialNumber(merchantSerialNumber)
+                        .apiV3Key(apiV3Key)
+                        .build();
+        CashCouponsService cashCouponsService = new CashCouponsService.Builder().config(config).build();
+        ListStocksRequest listStocksRequest=new ListStocksRequest();
+        listStocksRequest.setStockCreatorMchid("1708581355");
+        cashCouponsService.listStocks(listStocksRequest);
+
         return null;
     }
 
     @Override
     public JSONObject useFlow(JSONObject params) {
+        Config config =
+                new RSAAutoCertificateConfig.Builder()
+                        .merchantId(merchantId)
+                        .privateKeyFromPath(privateKeyPath)
+                        .merchantSerialNumber(merchantSerialNumber)
+                        .apiV3Key(apiV3Key)
+                        .build();
+        CashCouponsService cashCouponsService = new CashCouponsService.Builder().config(config).build();
+        UseFlowRequest useFlowRequest=new UseFlowRequest();
+        useFlowRequest.setStockId("");
+        UseFlowResponse useFlowResponse = cashCouponsService.useFlow(useFlowRequest);
+
         return null;
     }
 }
