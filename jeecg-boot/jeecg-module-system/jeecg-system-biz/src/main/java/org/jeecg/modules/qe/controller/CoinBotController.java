@@ -11,7 +11,9 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.checkerframework.checker.units.qual.C;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
@@ -23,13 +25,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.modules.qe.entity.CoinBot;
+import org.jeecg.modules.qe.entity.CoinBotDTO;
+import org.jeecg.modules.qe.entity.TickerResutl;
 import org.jeecg.modules.qe.service.ICoinBotService;
+import org.jeecg.modules.qe.service.impl.BinanceClientService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.jeecg.common.system.base.controller.JeecgController;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,7 +60,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class CoinBotController extends JeecgController<CoinBot, ICoinBotService> {
 	@Autowired
 	private ICoinBotService coinBotService;
-	
+
+
+	@Autowired
+	BinanceClientService binanceClientService;
 	/**
 	 * 分页列表查询
 	 *
@@ -67,7 +76,7 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 	//@AutoLog(value = "机器人列表-分页列表查询")
 	@ApiOperation(value="机器人列表-分页列表查询", notes="机器人列表-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<CoinBot>> queryPageList(CoinBot coinBot,
+	public Result<IPage<CoinBotDTO>> queryPageList(CoinBot coinBot,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
@@ -80,7 +89,26 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
         QueryWrapper<CoinBot> queryWrapper = QueryGenerator.initQueryWrapper(coinBot, req.getParameterMap(),customeRuleMap);
 		Page<CoinBot> page = new Page<CoinBot>(pageNo, pageSize);
 		IPage<CoinBot> pageList = coinBotService.page(page, queryWrapper);
-		return Result.OK(pageList);
+		//封装当当前行情价格
+
+		List<TickerResutl> list = binanceClientService.getList(false);
+		List<CoinBotDTO> newRecord = pageList.getRecords().stream().map(bot -> {
+			TickerResutl tickerResutl = list.stream().filter(ticker -> ticker.getBaseCoin().toUpperCase().equals(bot.getSymbol().toUpperCase())).findFirst().orElse(null);
+			CoinBotDTO dto = new CoinBotDTO();
+			if (tickerResutl != null) {
+				BeanUtils.copyProperties(bot, dto);
+				dto.setCurrentPrice(tickerResutl.getPriceUsd());
+			}else{
+				dto.setCurrentPrice(0f);
+			}
+
+			return  dto;
+		}).collect(Collectors.toList());
+		IPage<CoinBotDTO> newpageList= new Page<CoinBotDTO>(pageNo,pageSize);
+		newpageList.setRecords(newRecord);
+		newpageList.setTotal(pageList.getTotal());
+		newpageList.setCurrent(pageList.getCurrent());
+		return Result.OK(newpageList);
 	}
 	
 	/**
@@ -126,8 +154,28 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 
 		}
 	}
-	
-	/**
+
+	 @AutoLog(value = "机器人列表-编辑")
+	 @ApiOperation(value="机器人列表-编辑", notes="机器人列表-编辑")
+	 @RequiresPermissions("qe:coin_bot:edit")
+		 @RequestMapping(value = "/editconfig", method = {RequestMethod.PUT,RequestMethod.POST})
+	 public Result<String> editConfig(@RequestBody JSONObject param) {
+
+		 System.out.println(param);
+		 String id = param.getString("id");
+		 String gridConfig = param.getString("gridConfig");
+		 Float addInvest = param.getFloat("addInvest");
+		 boolean u= coinBotService.editGrideConfig(id,gridConfig,addInvest);
+		 if (u){
+			 return Result.OK("编辑成功!");
+		 }else {
+			 return Result.error("修改失败");
+
+		 }
+	 }
+
+
+	 /**
 	 *   通过id删除
 	 *
 	 * @param id

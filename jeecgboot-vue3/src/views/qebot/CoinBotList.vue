@@ -45,11 +45,11 @@
     <CoinBotModal @register="registerModal" @success="handleSuccess" />
 
     <div>
-      <a-modal v-model:open="open" width="100%" wrap-class-name="full-modal" title="机器人参数" @ok="handleOk">
+      <a-modal v-model:open="open" width="100%" wrap-class-name="full-modal" title="动态调仓" @ok="handleOk">
         <a-row>
           <a-col :span="8" style="margin-right: 10px">
             <span>网格参数</span>
-            <a-table :columns="gridColumns" :data-source="currentBot" :pagination="false" />
+            <a-table :columns="gridColumns" :data-source="currentBotGrid" :pagination="false" />
           </a-col>
           <a-col :span="15">
             <span>匹配订单</span>
@@ -65,6 +65,48 @@
         </a-row>
       </a-modal>
     </div>
+
+    <div>
+      <a-modal v-model:open="openPostionEdit" width="100%" wrap-class-name="full-modal" title="机器人参数" @ok="handlePositonOk">
+        <a-row>
+          <a-col :span="8" style="margin-right: 10px">
+            <span>网格参数</span>
+            <a-table :columns="gridColumns" @change="handleChangePisition" :data-source="currentBotGrid" :pagination="paginationGride" />
+          </a-col>
+          <a-col :span="15">
+            <span>调整参数</span>
+            <a-form
+              :model="positionFormState"
+              name="basic"
+              :label-col="{ span: 8 }"
+              :wrapper-col="{ span: 16 }"
+              autocomplete="off"
+              @finish="onFinish"
+              @finish-failed="onFinishFailed"
+            >
+              <a-form-item label="已有网格数" name="current_grid" :rules="[{ required: true, message: '已有网格' }]">
+                <a-input v-model:value="positionFormState.current_grid" />
+              </a-form-item>
+
+              <a-form-item label="向下扩展网格" name="down" :rules="[{ required: true, message: '输入向下扩展网格数' }]">
+                <a-input v-model:value="positionFormState.down" />
+              </a-form-item>
+
+              <a-form-item label="向上扩展网格" name="up" :rules="[{ required: true, message: '输入向上扩展网格数' }]">
+                <a-input v-model:value="positionFormState.up" />
+              </a-form-item>
+
+              <a-form-item label="追加投资" name="addInvest" :rules="[{ required: true, message: '需要追加投资' }]">
+                <a-input v-model:value="positionFormState.addInvest" />
+              </a-form-item>
+              <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+                <a-button type="primary" @click="calculateGride" html-type="submit">计算参数 </a-button>
+              </a-form-item>
+            </a-form>
+          </a-col>
+        </a-row>
+      </a-modal>
+    </div>
   </div>
 </template>
 
@@ -75,7 +117,7 @@
   import { useListPage } from '/@/hooks/system/useListPage';
   import CoinBotModal from './components/CoinBotModal.vue';
   import { columns, searchFormSchema, superQuerySchema } from './CoinBot.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, batchOperate } from './CoinBot.api';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, batchOperate, editConfigApi } from './CoinBot.api';
   import { list as orderList } from '../coinOrder/CoinOrder.api';
 
   import { downloadFile, render } from '/@/utils/common/renderUtils';
@@ -83,6 +125,96 @@
   import msg from '@/views/demo/feat/msg/index.vue';
   import { TableColumnsType } from 'ant-design-vue';
   import HeadInfo from '@/components/chart/HeadInfo.vue';
+
+  //动态调仓区域
+
+  interface positionForm {
+    down: number;
+    up: number;
+    current_grid: number;
+    addInvest: number;
+  }
+
+  const positionFormState = reactive<positionForm>({
+    down: 0,
+    up: 0,
+    current_grid: 20,
+    addInvest: 0,
+  });
+  const onFinish = (values: any) => {
+    console.log('Success:', values);
+  };
+
+  const onFinishFailed = (errorInfo: any) => {
+    console.log('Failed:', errorInfo);
+  };
+  //计算调整后的网格
+
+  const calculateGride = () => {
+    currentBotGrid.value = JSON.parse(currentBot.value['gridConfig']);
+    const currentPrice = currentBot.value['currentPrice'];
+    let oldGrid = [...currentBotGrid.value].sort((a, b) => a['buy_price'] - b['buy_price']);
+    //向下调整网格
+    const grideProfit = currentBot.value['grideProfit'];
+    const addGrid = [];
+
+    //向下添加网格
+    if (positionFormState.down > 0) {
+      const firstGrid = oldGrid[0];
+      let addInvest = 0;
+      for (let i = 1; i <= positionFormState.down; i++) {
+        let addGridItem = {
+          buy_price: firstGrid['buy_price'] * (1 - grideProfit) ** i,
+          buy_order_num: currentBot.value['perOrder'],
+        };
+        addInvest += addGridItem['buy_price'] * addGridItem['buy_order_num'];
+        if (i == 1) {
+          addGridItem['sell_price'] = firstGrid['buy_price'];
+        } else {
+          addGridItem['sell_price'] = firstGrid['buy_price'] * (1 - grideProfit) ** (i - 1);
+        }
+        addGridItem['buy_order_id'] = '';
+        addGridItem['sell_order_id'] = '';
+        addGrid.push(addGridItem);
+      }
+      const newGrid = addGrid.concat(oldGrid);
+      const addNewGrid = [...newGrid].sort((a, b) => {
+        return a['buy_price'] - b['buy_price'];
+      });
+      console.log(addNewGrid);
+      positionFormState.addInvest = addInvest;
+      currentBotGrid.value = addNewGrid;
+    }
+
+    //向上添加网格
+    if (positionFormState.up > 0) {
+      const firstGrid = oldGrid[oldGrid.length - 1];
+      let addInvest = 0;
+      for (let i = 1; i <= positionFormState.up; i++) {
+        let addGridItem = {
+          buy_price: firstGrid['buy_price'] * (1 + grideProfit) ** i,
+          buy_order_num: currentBot.value['perOrder'],
+        };
+        addInvest += addGridItem['buy_price'] * addGridItem['buy_order_num'];
+        if (i == 1) {
+          addGridItem['sell_price'] = firstGrid['buy_price'];
+        } else {
+          addGridItem['sell_price'] = firstGrid['buy_price'] * (1 + grideProfit) ** (i - 1);
+        }
+        addGridItem['buy_order_id'] = '';
+        addGridItem['sell_order_id'] = '';
+        addGrid.push(addGridItem);
+      }
+      const newGrid = addGrid.concat(oldGrid);
+      const addNewGrid = [...newGrid].sort((a, b) => {
+        return a['buy_price'] - b['buy_price'];
+      });
+      positionFormState.addInvest = addInvest;
+      console.log(addNewGrid);
+      paginationGride.value['total'] = addNewGrid.length;
+      currentBotGrid.value = addNewGrid;
+    }
+  };
 
   const queryParam = reactive<any>({});
   const checkedKeys = ref<Array<string | number>>([]);
@@ -131,14 +263,13 @@
       title: '买入订单',
       dataIndex: 'buy_order_id',
       key: 'buy_order_id',
-      resizable: true,
+      minWidth: 30,
       width: 50,
     },
     {
       title: '买入数量',
       dataIndex: 'buy_order_num',
       key: 'buy_order_num',
-      resizable: true,
       minWidth: 30,
       maxWidth: 50,
     },
@@ -146,6 +277,7 @@
       title: '买入价格',
       dataIndex: 'buy_price',
       key: 'buy_price',
+      minWidth: 30,
       maxWidth: 50,
       customRender: ({ text }) => {
         if (text) {
@@ -158,6 +290,7 @@
       title: '卖出订单',
       key: 'sell_order_id',
       dataIndex: 'sell_order_id',
+      minWidth: 30,
       maxWidth: 50,
     },
     {
@@ -170,6 +303,7 @@
         }
         return text;
       },
+      minWidth: 30,
       maxWidth: 50,
     },
   ]);
@@ -247,9 +381,10 @@
 
   // 高级查询配置
   const superQueryConfig = reactive(superQuerySchema);
-
   const open = ref<boolean>(false);
-  const currentBot = ref<Object>(false);
+  const openPostionEdit = ref<boolean>(false);
+  const currentBotGrid = ref<Object>({});
+  const currentBot = ref<Object>({});
   const currentOrder = ref<Object>(false);
   const params = ref<Object>({
     column: 'createTime',
@@ -259,13 +394,14 @@
     botId: '1895698783372677121_dogeusdt_BINANCE_spot_gride',
   });
   const pagination = ref<Object>({ total: 10, current: 1, pageSize: 10 });
+  //网格参数调仓
+  const paginationGride = ref<Object>({ total: 10, current: 1, pageSize: 10 });
   const showBuyModal = (record) => {
-    currentBot.value = JSON.parse(record.gridConfig);
-
+    currentBotGrid.value = JSON.parse(record.gridConfig);
+    currentBot.value = record;
     //请求匹配订单
     params.value['botId'] = record['instanceName'];
     orderList(params.value).then((res) => {
-      console.log(res);
       pagination.value.total = res.total;
       pagination.value.current = res.current;
       pagination.value.pageSize = res.size;
@@ -273,19 +409,54 @@
     });
     open.value = true;
   };
+  const showPostionEdit = (record) => {
+    openPostionEdit.value = true;
+    let tmp = JSON.parse(record.gridConfig);
+    const sortTmp = [...tmp].sort((a, b) => a['buy_price'] - b['buy_price']);
+    currentBotGrid.value = sortTmp;
+    currentBot.value = record;
+    paginationGride.value['total'] = sortTmp.length;
+    paginationGride.value['current'] = 1;
+    paginationGride.value['pageSize'] = 10;
+    positionFormState.addInvest = 0;
+    positionFormState.up = 0;
+    positionFormState.down = 0;
+    positionFormState.current_grid = sortTmp.length;
+  };
 
   const handleOk = (e: MouseEvent) => {
     open.value = false;
   };
 
+  const handlePositonOk = (e: MouseEvent) => {
+    openPostionEdit.value = false;
+    console.log('保存配置', currentBotGrid.value, positionFormState.addInvest);
+    const param = {
+      gridConfig: JSON.stringify(currentBotGrid.value),
+      addInvest: positionFormState.addInvest,
+      id: currentBot.value['id'],
+    };
+    editConfigApi(param).then((res) => {
+      if (res.success) {
+      } else {
+      }
+    });
+  };
+
+  const handleChangePisition = (data) => {
+    paginationGride.value['total'] = 20;
+    paginationGride.value['current'] = data.current;
+    paginationGride.value['pageSize'] = 10;
+  };
+
   const handleChange = (data) => {
-    console.log('tablechange', data);
     params.value['pageNo'] = data.current;
     params.value['pageSize'] = data.pageSize;
+    params.value['pageSize'] = data.pageSize;
     orderList(params.value).then((res) => {
-      pagination.value.total = res.total;
-      pagination.value.current = res.current;
-      pagination.value.pageSize = res.size;
+      pagination.value['total'] = res.total;
+      pagination.value['current'] = res.current;
+      pagination.value['pageSize'] = res.size;
       console.log(pagination.value);
       currentOrder.value = res.records;
     });
@@ -391,6 +562,10 @@
       {
         label: '买入明细',
         onClick: showBuyModal.bind(null, record),
+      },
+      {
+        label: '动态调仓',
+        onClick: showPostionEdit.bind(null, record),
       },
       {
         label: '详情',

@@ -7,6 +7,7 @@ enum Api {
   list = '/qe/coinBot/list',
   save = '/qe/coinBot/add',
   edit = '/qe/coinBot/edit',
+  editConfigApi = '/qe/coinBot/editconfig',
   deleteOne = '/qe/coinBot/delete',
   deleteBatch = '/qe/coinBot/deleteBatch',
   operateBatch = '/qe/coinBot/operateBatch',
@@ -75,5 +76,14 @@ export const batchOperate = (params, handleSuccess) => {
  */
 export const saveOrUpdate = (params, isUpdate) => {
   let url = isUpdate ? Api.edit : Api.save;
+  return defHttp.post({ url: url, params });
+};
+
+/**
+ * 保存或者更新
+ * @param params
+ */
+export const editConfigApi = (params) => {
+  let url = Api.editConfigApi
   return defHttp.post({ url: url, params });
 };

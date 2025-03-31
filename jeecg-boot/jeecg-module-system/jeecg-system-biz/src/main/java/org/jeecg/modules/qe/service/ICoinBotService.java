@@ -18,4 +18,6 @@ public interface ICoinBotService extends IService<CoinBot> {
    public  boolean  operateBatch(List<String> ids, String type);
 
    public  boolean  check(CoinBot coinBot);
+
+    boolean editGrideConfig(String id, String gridConfig, Float addInvest);
 }

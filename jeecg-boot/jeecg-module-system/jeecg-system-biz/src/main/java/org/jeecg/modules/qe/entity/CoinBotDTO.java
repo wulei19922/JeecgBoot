@@ -1,0 +1,159 @@
+package org.jeecg.modules.qe.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * @Description: 机器人列表
+ * @Author: jeecg-boot
+ * @Date:   2025-03-06
+ * @Version: V1.0
+ */
+@Data
+public class CoinBotDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+	/**createBy*/
+    @ApiModelProperty(value = "createBy")
+    private String createBy;
+	/**id*/
+	@TableId(type = IdType.ASSIGN_ID)
+    @ApiModelProperty(value = "id")
+    private String id;
+	/**createTime*/
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "createTime")
+    private Date createTime;
+	/**算法类型*/
+	@Excel(name = "算法类型", width = 15, dicCode = "qe_bot_type")
+	@Dict(dicCode = "qe_bot_type")
+    @ApiModelProperty(value = "算法类型")
+    private String categoryType;
+	/**用户*/
+	@Excel(name = "用户", width = 15, dictTable = "sys_user", dicText = "username", dicCode = "id")
+	@Dict(dictTable = "sys_user", dicText = "username", dicCode = "id")
+    @ApiModelProperty(value = "用户")
+    private String memberId;
+	/**当前状态*/
+	@Excel(name = "当前状态", width = 15, dicCode = "bot_status")
+	@Dict(dicCode = "bot_status")
+    @ApiModelProperty(value = "当前状态")
+    private String status;
+	/**类型*/
+	@Excel(name = "类型", width = 15, dicCode = "exchange")
+	@Dict(dicCode = "exchange")
+    @ApiModelProperty(value = "类型")
+    private String type;
+	/**开启状态*/
+	@Excel(name = "开启状态", width = 15, dicCode = "qot_status")
+	@Dict(dicCode = "qot_status")
+    @ApiModelProperty(value = "开启状态")
+    private Integer openStatus;
+	/**总投资额*/
+	@Excel(name = "总投资额", width = 15)
+    @ApiModelProperty(value = "总投资额")
+    private Double totalInvest;
+	/**交易对*/
+	@Excel(name = "交易对", width = 15, dictTable = "coin_support", dicText = "symbol", dicCode = "symbol")
+	@Dict(dictTable = "coin_support", dicText = "symbol", dicCode = "symbol")
+    @ApiModelProperty(value = "交易对")
+    private String symbol;
+	/**收益*/
+	@Excel(name = "收益", width = 15)
+    @ApiModelProperty(value = "收益")
+    private Double income;
+	/**网格收益*/
+	@Excel(name = "网格收益", width = 15)
+    @ApiModelProperty(value = "网格收益")
+    private Double incomeGride;
+	/**净利润*/
+	@Excel(name = "净利润", width = 15)
+    @ApiModelProperty(value = "净利润")
+    private Double profit;
+	/**配对次数*/
+	@Excel(name = "配对次数", width = 15)
+    @ApiModelProperty(value = "配对次数")
+    private Integer matchNum;
+	/**区间最大价格*/
+	@Excel(name = "区间最大价格", width = 15)
+    @ApiModelProperty(value = "区间最大价格")
+    private Double maxPrice;
+	/**区间最小价格*/
+	@Excel(name = "区间最小价格", width = 15)
+    @ApiModelProperty(value = "区间最小价格")
+    private Double minPrice;
+	/**网格数量*/
+	@Excel(name = "网格数量", width = 15)
+    @ApiModelProperty(value = "网格数量")
+    private Integer grideNum;
+	/**单次交易数量*/
+	@Excel(name = "单次交易数量", width = 15)
+    @ApiModelProperty(value = "单次交易数量")
+    private Double perOrder;
+	/**机器人节点机器*/
+	@Excel(name = "机器人节点机器", width = 15)
+    @ApiModelProperty(value = "机器人节点机器")
+    private String nodeName;
+	/**节点IP*/
+	@Excel(name = "节点IP", width = 15)
+    @ApiModelProperty(value = "节点IP")
+    private String nodeIp;
+	/**实例名*/
+	@Excel(name = "实例名", width = 15)
+    @ApiModelProperty(value = "实例名")
+    private String instanceName;
+	/**单网格利润率*/
+	@Excel(name = "单网格利润率", width = 15)
+    @ApiModelProperty(value = "单网格利润率")
+    private Double grideProfit;
+	/**环境*/
+	@Excel(name = "环境", width = 15, dicCode = "env")
+	@Dict(dicCode = "env")
+    @ApiModelProperty(value = "环境")
+    private String env;
+	/**持仓*/
+	@Excel(name = "持仓", width = 15)
+    @ApiModelProperty(value = "持仓")
+    private Double positions;
+	/**初始买入资金比例*/
+	@Excel(name = "初始买入资金比例", width = 15)
+    @ApiModelProperty(value = "初始买入资金比例")
+    private Double initRate;
+	/**机器人异常信息*/
+	@Excel(name = "机器人异常信息", width = 15)
+    @ApiModelProperty(value = "机器人异常信息")
+    private String errmsg;
+	/**止损比例*/
+	@Excel(name = "止损比例", width = 15)
+    @ApiModelProperty(value = "止损比例")
+    private Double stopLoss;
+	/**减仓初始价格*/
+	@Excel(name = "减仓初始价格", width = 15)
+    @ApiModelProperty(value = "减仓初始价格")
+    private Double basePrice;
+	/**网格配置*/
+	@Excel(name = "网格配置", width = 15)
+    @ApiModelProperty(value = "网格配置")
+    private String gridConfig;
+	/**合约杠杆*/
+	@Excel(name = "合约杠杆", width = 15)
+    @ApiModelProperty(value = "合约杠杆")
+    private Double lever;
+
+
+	private Float currentPrice;
+}

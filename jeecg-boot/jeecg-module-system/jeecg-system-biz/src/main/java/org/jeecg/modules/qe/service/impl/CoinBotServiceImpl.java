@@ -66,4 +66,21 @@ public class CoinBotServiceImpl extends ServiceImpl<CoinBotMapper, CoinBot> impl
         }
         return false;
     }
+
+    @Override
+    public boolean editGrideConfig(String id, String gridConfig, Float addInvest) {
+       try {
+           //初始化结果
+           CoinBot coinBot = this.getById(id);
+           //更改为重启中
+           coinBot.setStatus("8");
+           //更新配置
+           coinBot.setGridConfig(gridConfig);
+           coinBot.setTotalInvest(coinBot.getTotalInvest()+Double.parseDouble(addInvest.toString()));
+           this.updateById(coinBot);
+           return  true;
+       }catch (Exception e ){
+           return false;
+       }
+    }
 }
