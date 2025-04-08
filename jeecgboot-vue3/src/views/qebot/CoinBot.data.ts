@@ -141,6 +141,26 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'lever',
   },
+  {
+    title: '累计买单',
+    align: 'center',
+    dataIndex: 'buyNum',
+  },
+  {
+    title: '累计卖单',
+    align: 'center',
+    dataIndex: 'sellNum',
+  },
+  {
+    title: '卖出所有持仓点位',
+    align: 'center',
+    dataIndex: 'sellAllPrice',
+  },
+  {
+    title: '重新进入点位',
+    align: 'center',
+    dataIndex: 'startBuyPrice',
+  },
 ];
 //查询数据
 export const searchFormSchema: FormSchema[] = [
@@ -370,6 +390,26 @@ export const formSchema: FormSchema[] = [
     field: 'lever',
     component: 'InputNumber',
   },
+  {
+    label: '累计买单',
+    field: 'buyNum',
+    component: 'InputNumber',
+  },
+  {
+    label: '累计卖单',
+    field: 'sellNum',
+    component: 'InputNumber',
+  },
+  {
+    label: '卖出所有持仓点位',
+    field: 'sellAllPrice',
+    component: 'InputNumber',
+  },
+  {
+    label: '重新进入点位',
+    field: 'startBuyPrice',
+    component: 'InputNumber',
+  },
   // TODO 主键隐藏字段，目前写死为ID
   {
     label: '',
@@ -382,12 +422,28 @@ export const formSchema: FormSchema[] = [
 // 高级查询数据
 export const superQuerySchema = {
   categoryType: { title: '算法类型', order: 0, view: 'list', type: 'string', dictCode: 'qe_bot_type' },
-  memberId: { title: '用户', order: 1, view: 'sel_search', type: 'string', dictTable: 'sys_user', dictCode: 'id', dictText: 'username' },
+  memberId: {
+    title: '用户',
+    order: 1,
+    view: 'sel_search',
+    type: 'string',
+    dictTable: 'sys_user',
+    dictCode: 'id',
+    dictText: 'username',
+  },
   status: { title: '当前状态', order: 2, view: 'list', type: 'string', dictCode: 'bot_status' },
   type: { title: '类型', order: 3, view: 'list', type: 'string', dictCode: 'exchange' },
   openStatus: { title: '开启状态', order: 4, view: 'number', type: 'number', dictCode: 'qot_status' },
   totalInvest: { title: '总投资额', order: 5, view: 'number', type: 'number' },
-  symbol: { title: '交易对', order: 6, view: 'list', type: 'string', dictTable: 'coin_support', dictCode: 'symbol', dictText: 'symbol' },
+  symbol: {
+    title: '交易对',
+    order: 6,
+    view: 'list',
+    type: 'string',
+    dictTable: 'coin_support',
+    dictCode: 'symbol',
+    dictText: 'symbol',
+  },
   income: { title: '收益', order: 7, view: 'number', type: 'number' },
   incomeGride: { title: '网格收益', order: 8, view: 'number', type: 'number' },
   profit: { title: '净利润', order: 9, view: 'number', type: 'number' },
@@ -408,6 +464,10 @@ export const superQuerySchema = {
   basePrice: { title: '减仓初始价格', order: 24, view: 'number', type: 'number' },
   gridConfig: { title: '网格配置', order: 25, view: 'text', type: 'string' },
   lever: { title: '合约杠杆', order: 26, view: 'number', type: 'number' },
+  buyNum: { title: '累计买单', order: 27, view: 'number', type: 'number' },
+  sellNum: { title: '累计卖单', order: 28, view: 'number', type: 'number' },
+  sellAllPrice: { title: '卖出所有持仓点位', order: 29, view: 'number', type: 'number' },
+  startBuyPrice: { title: '重新进入点位', order: 30, view: 'number', type: 'number' },
 };
 
 /**

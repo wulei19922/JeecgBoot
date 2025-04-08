@@ -4,6 +4,7 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
+        <a-button type="primary" v-auth="'qe:coin_bot:add'" @click="handleControlPanel" preIcon="ant-design:plus-outlined"> 控制面板 </a-button>
         <a-button type="primary" v-auth="'qe:coin_bot:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
         <a-button type="primary" v-auth="'qe:coin_bot:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出 </a-button>
         <j-upload-button type="primary" v-auth="'qe:coin_bot:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
@@ -125,7 +126,8 @@
   import msg from '@/views/demo/feat/msg/index.vue';
   import { TableColumnsType } from 'ant-design-vue';
   import HeadInfo from '@/components/chart/HeadInfo.vue';
-
+  import { useRouter } from "vue-router";
+  let router = useRouter();
   //动态调仓区域
 
   interface positionForm {
@@ -470,6 +472,14 @@
       queryParam[k] = params[k];
     });
     reload();
+  }
+
+  /**
+   *控制面板
+   */
+
+  function handleControlPanel(record) {
+    router.push('/panel');
   }
 
   /**

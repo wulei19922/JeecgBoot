@@ -154,6 +154,23 @@ public class CoinBotDTO implements Serializable {
     @ApiModelProperty(value = "合约杠杆")
     private Double lever;
 
+	/**累计买单*/
+	@Excel(name = "累计买单", width = 15)
+	@ApiModelProperty(value = "累计买单")
+	private Integer buyNum;
+	/**累计卖单*/
+	@Excel(name = "累计卖单", width = 15)
+	@ApiModelProperty(value = "累计卖单")
+	private Integer sellNum;
+	/**卖出所有持仓点位*/
+	@Excel(name = "卖出所有持仓点位", width = 15)
+	@ApiModelProperty(value = "卖出所有持仓点位")
+	private Double sellAllPrice;
+	/**重新进入点位*/
+	@Excel(name = "重新进入点位", width = 15)
+	@ApiModelProperty(value = "重新进入点位")
+	private Double startBuyPrice;
+
 
 	private Float currentPrice;
 }

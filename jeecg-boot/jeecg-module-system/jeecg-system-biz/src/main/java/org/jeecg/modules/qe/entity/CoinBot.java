@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * @Description: 机器人列表
  * @Author: jeecg-boot
- * @Date:   2025-03-06
+ * @Date:   2025-04-05
  * @Version: V1.0
  */
 @Data
@@ -157,4 +157,20 @@ public class CoinBot implements Serializable {
 	@Excel(name = "合约杠杆", width = 15)
     @ApiModelProperty(value = "合约杠杆")
     private Double lever;
+	/**累计买单*/
+	@Excel(name = "累计买单", width = 15)
+    @ApiModelProperty(value = "累计买单")
+    private Integer buyNum;
+	/**累计卖单*/
+	@Excel(name = "累计卖单", width = 15)
+    @ApiModelProperty(value = "累计卖单")
+    private Integer sellNum;
+	/**卖出所有持仓点位*/
+	@Excel(name = "卖出所有持仓点位", width = 15)
+    @ApiModelProperty(value = "卖出所有持仓点位")
+    private Double sellAllPrice;
+	/**重新进入点位*/
+	@Excel(name = "重新进入点位", width = 15)
+    @ApiModelProperty(value = "重新进入点位")
+    private Double startBuyPrice;
 }

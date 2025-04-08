@@ -20,4 +20,23 @@ export const AI_ROUTE: AppRouteRecordRaw = {
   ],
 };
 
-export const staticRoutesList = [AI_ROUTE];
+export const CONTROLL_ROUTE: AppRouteRecordRaw = {
+  path: '',
+  name: 'control',
+  component: LAYOUT,
+  meta: {
+    title: 'control',
+  },
+  children: [
+    {
+      path: '/panel',
+      name: 'panel',
+      component: () => import('/@/views/qebot/ControlPanel.vue'),
+      meta: {
+        title: 'AI助手',
+      },
+    },
+  ],
+};
+
+export const staticRoutesList = [AI_ROUTE, CONTROLL_ROUTE];
