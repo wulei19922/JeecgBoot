@@ -4,9 +4,9 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'m:market_vouchers:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button type="primary" v-auth="'m:market_vouchers:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button type="primary" v-auth="'m:market_vouchers:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
+        <a-button type="primary" v-auth="'m:voucher_wechat_bank:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
+        <a-button type="primary" v-auth="'m:voucher_wechat_bank:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
+        <j-upload-button type="primary" v-auth="'m:voucher_wechat_bank:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
           >导入</j-upload-button
         >
         <a-dropdown v-if="selectedRowKeys.length > 0">
@@ -18,7 +18,7 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button v-auth="'m:market_vouchers:deleteBatch'"
+          <a-button v-auth="'m:voucher_wechat_bank:deleteBatch'"
             >批量操作
             <Icon icon="mdi:chevron-down" />
           </a-button>
@@ -34,35 +34,30 @@
       <template #bodyCell="{ column, record, index, text }"> </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <MarketVouchersModal @register="registerMarketModal" @success="handleSuccess" />
-    <!-- 微信优惠券配置 -->
-    <VouchersWechatModal @register="registerWechatModal" @success="handleSuccess" />
+    <VoucherWechatBankModal @register="registerModal" @success="handleSuccess" />
   </div>
 </template>
 
-<script lang="ts" name="m-marketVouchers" setup>
+<script lang="ts" name="m-voucherWechatBank" setup>
   import { ref, reactive, computed, unref } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { useListPage } from '/@/hooks/system/useListPage';
   import { useModal } from '/@/components/Modal';
-  import MarketVouchersModal from './components/MarketVouchersModal.vue';
-  import { columns, searchFormSchema, superQuerySchema } from './MarketVouchers.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, activeAct } from './MarketVouchers.api';
-  import { queryById } from './VouchersWechat.api';
+  import { useListPage } from '/@/hooks/system/useListPage';
+  import VoucherWechatBankModal from './components/VoucherWechatBankModal.vue';
+  import { columns, searchFormSchema, superQuerySchema } from './VoucherWechatBank.data';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './VoucherWechatBank.api';
+  import {activeAct } from './MarketVouchers.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import { useUserStore } from '/@/store/modules/user';
-  import VouchersWechatModal from './components/VouchersWechatModal.vue';
   const queryParam = reactive<any>({});
   const checkedKeys = ref<Array<string | number>>([]);
   const userStore = useUserStore();
-  // 在 setup 脚本中修改
-  const [registerMarketModal, { openModal: openMarketModal }] = useModal();
-  const [registerWechatModal, { openModal: openWechatModal }] = useModal();
-
+  //注册model
+  const [registerModal, { openModal }] = useModal();
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: '支付营销代金券场景',
+      title: '银行营销表',
       api: list,
       columns,
       canResize: false,
@@ -83,7 +78,7 @@
       },
     },
     exportConfig: {
-      name: '支付营销代金券场景',
+      name: '银行营销表',
       url: getExportUrl,
       params: queryParam,
     },
@@ -107,12 +102,11 @@
     });
     reload();
   }
-
   /**
    * 新增事件
    */
   function handleAdd() {
-    openMarketModal(true, {
+    openModal(true, {
       isUpdate: false,
       showFooter: true,
     });
@@ -121,45 +115,25 @@
    * 编辑事件
    */
   function handleEdit(record: Recordable) {
-    openMarketModal(true, {
+    openModal(true, {
       record,
       isUpdate: true,
       showFooter: true,
     });
   }
 
-  /**
-   * 详情
-   */
-  function active(record: Recordable) {
-    activeAct({id:record.id}).then((res) => {
-      console.log('已激活');
-    });
-  }
+  function wechatCreate(record: Recordable) {
+    activeAct(record).then((res) => {
 
+      console.log("已激活")
+
+    })
+  }
   /**
    * 详情
    */
   function handleDetail(record: Recordable) {
-    openMarketModal(true, {
-      record,
-      isUpdate: true,
-      showFooter: false,
-    });
-  }
-
-  /**
-   * 配置优惠券规则
-   */
-  async function settingVouchers(record: Recordable) {
-    // 根据详情查询表名
-    await queryById({ id: record.settingId }, hanldeSettings);
-  }
-
-  function hanldeSettings(record) {
-    console.log('返回参数详细信息');
-    console.log(record);
-    openWechatModal(true, {
+    openModal(true, {
       record,
       isUpdate: true,
       showFooter: false,
@@ -191,31 +165,18 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'm:market_vouchers:edit',
+        auth: 'm:voucher_wechat_bank:edit',
       },
     ];
   }
-
   /**
    * 下拉操作栏
    */
   function getDropDownAction(record) {
     return [
       {
-        label: '配置',
-        onClick: settingVouchers.bind(null, record),
-      },
-      {
-        label: '激活',
-        onClick: active.bind(null, record),
-      },
-      {
-        label: '暂停',
-        onClick: handleDetail.bind(null, record),
-      },
-      {
-        label: '重启',
-        onClick: handleDetail.bind(null, record),
+        label: '微信创建',
+        onClick: wechatCreate.bind(null, record),
       },
       {
         label: '详情',
@@ -228,7 +189,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'm:market_vouchers:delete',
+        auth: 'm:voucher_wechat_bank:delete',
       },
     ];
   }

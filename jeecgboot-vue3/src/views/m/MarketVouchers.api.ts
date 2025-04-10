@@ -11,6 +11,7 @@ enum Api {
   deleteBatch = '/m/marketVouchers/deleteBatch',
   importExcel = '/m/marketVouchers/importExcel',
   exportXls = '/m/marketVouchers/exportXls',
+  activeAct = '/wechat/active',
   marketVouchersMerchantsList = '/m/marketVouchers/queryMarketVouchersMerchantsByMainId',
 }
 /**
@@ -67,4 +68,11 @@ export const batchDelete = (params, handleSuccess) => {
 export const saveOrUpdate = (params, isUpdate) => {
   const url = isUpdate ? Api.edit : Api.save;
   return defHttp.post({ url: url, params });
+};
+/**
+ * 保存或者更新
+ * @param params
+ */
+export const activeAct = (params) => {
+  return defHttp.get({ url: Api.activeAct, params });
 };
