@@ -13,6 +13,8 @@ enum Api {
   operateBatch = '/qe/coinBot/operateBatch',
   importExcel = '/qe/coinBot/importExcel',
   exportXls = '/qe/coinBot/exportXls',
+  kafka = '/qe/coinBot/kafka/manager',
+  kafkaPod = '/qe/coinBot/kafka/pod',
 }
 /**
  * 导出api
@@ -85,5 +87,17 @@ export const saveOrUpdate = (params, isUpdate) => {
  */
 export const editConfigApi = (params) => {
   let url = Api.editConfigApi
+  return defHttp.post({ url: url, params });
+};
+/**
+ * 保存或者更新
+ * @param params
+ */
+export const kafkaApi = (params) => {
+  let url = Api.kafka
+  return defHttp.post({ url: url, params });
+};
+export const kafkaApiPod = (params) => {
+  let url = Api.kafkaPod
   return defHttp.post({ url: url, params });
 };

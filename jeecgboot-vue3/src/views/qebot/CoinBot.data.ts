@@ -40,36 +40,36 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'symbol_dictText',
   },
-  // {
-  //   title: '收益',
-  //   align: 'center',
-  //   dataIndex: 'income',
-  // },
-  // {
-  //   title: '网格收益',
-  //   align: 'center',
-  //   dataIndex: 'incomeGride',
-  // },
+  {
+    title: '收益',
+    align: 'center',
+    dataIndex: 'income',
+  },
+  {
+    title: '网格收益',
+    align: 'center',
+    dataIndex: 'incomeGride',
+  },
   {
     title: '净利润',
     align: 'center',
     dataIndex: 'profit',
   },
-  // {
-  //   title: '配对次数',
-  //   align: 'center',
-  //   dataIndex: 'matchNum',
-  // },
-  // {
-  //   title: '区间最大价格',
-  //   align: 'center',
-  //   dataIndex: 'maxPrice',
-  // },
-  // {
-  //   title: '区间最小价格',
-  //   align: 'center',
-  //   dataIndex: 'minPrice',
-  // },
+  {
+    title: '配对次数',
+    align: 'center',
+    dataIndex: 'matchNum',
+  },
+  {
+    title: '区间最大价格',
+    align: 'center',
+    dataIndex: 'maxPrice',
+  },
+  {
+    title: '区间最小价格',
+    align: 'center',
+    dataIndex: 'minPrice',
+  },
   {
     title: '网格数量',
     align: 'center',
@@ -80,25 +80,20 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'perOrder',
   },
-  // {
-  //   title: '机器人节点机器',
-  //   align: 'center',
-  //   dataIndex: 'nodeName',
-  // },
-  // {
-  //   title: '节点IP',
-  //   align: 'center',
-  //   dataIndex: 'nodeIp',
-  // },
-  // {
-  //   title: '实例名',
-  //   align: 'center',
-  //   dataIndex: 'instanceName',
-  // },
   {
-    title: '持仓',
+    title: '机器人节点机器',
     align: 'center',
-    dataIndex: 'positions',
+    dataIndex: 'nodeName',
+  },
+  {
+    title: '节点IP',
+    align: 'center',
+    dataIndex: 'nodeIp',
+  },
+  {
+    title: '实例名',
+    align: 'center',
+    dataIndex: 'instanceName',
   },
   {
     title: '单网格利润率',
@@ -110,7 +105,11 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'env_dictText',
   },
-
+  {
+    title: '持仓',
+    align: 'center',
+    dataIndex: 'positions',
+  },
   {
     title: '初始买入资金比例',
     align: 'center',
@@ -160,6 +159,11 @@ export const columns: BasicColumn[] = [
     title: '重新进入点位',
     align: 'center',
     dataIndex: 'startBuyPrice',
+  },
+  {
+    title: '交易状态',
+    align: 'center',
+    dataIndex: 'tradeStatus_dictText',
   },
 ];
 //查询数据
@@ -410,6 +414,14 @@ export const formSchema: FormSchema[] = [
     field: 'startBuyPrice',
     component: 'InputNumber',
   },
+  {
+    label: '交易状态',
+    field: 'tradeStatus',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'coin_trade_status',
+    },
+  },
   // TODO 主键隐藏字段，目前写死为ID
   {
     label: '',
@@ -422,28 +434,12 @@ export const formSchema: FormSchema[] = [
 // 高级查询数据
 export const superQuerySchema = {
   categoryType: { title: '算法类型', order: 0, view: 'list', type: 'string', dictCode: 'qe_bot_type' },
-  memberId: {
-    title: '用户',
-    order: 1,
-    view: 'sel_search',
-    type: 'string',
-    dictTable: 'sys_user',
-    dictCode: 'id',
-    dictText: 'username',
-  },
+  memberId: { title: '用户', order: 1, view: 'sel_search', type: 'string', dictTable: 'sys_user', dictCode: 'id', dictText: 'username' },
   status: { title: '当前状态', order: 2, view: 'list', type: 'string', dictCode: 'bot_status' },
   type: { title: '类型', order: 3, view: 'list', type: 'string', dictCode: 'exchange' },
   openStatus: { title: '开启状态', order: 4, view: 'number', type: 'number', dictCode: 'qot_status' },
   totalInvest: { title: '总投资额', order: 5, view: 'number', type: 'number' },
-  symbol: {
-    title: '交易对',
-    order: 6,
-    view: 'list',
-    type: 'string',
-    dictTable: 'coin_support',
-    dictCode: 'symbol',
-    dictText: 'symbol',
-  },
+  symbol: { title: '交易对', order: 6, view: 'list', type: 'string', dictTable: 'coin_support', dictCode: 'symbol', dictText: 'symbol' },
   income: { title: '收益', order: 7, view: 'number', type: 'number' },
   incomeGride: { title: '网格收益', order: 8, view: 'number', type: 'number' },
   profit: { title: '净利润', order: 9, view: 'number', type: 'number' },
@@ -468,6 +464,7 @@ export const superQuerySchema = {
   sellNum: { title: '累计卖单', order: 28, view: 'number', type: 'number' },
   sellAllPrice: { title: '卖出所有持仓点位', order: 29, view: 'number', type: 'number' },
   startBuyPrice: { title: '重新进入点位', order: 30, view: 'number', type: 'number' },
+  tradeStatus: { title: '交易状态', order: 31, view: 'list', type: 'string', dictCode: 'coin_trade_status' },
 };
 
 /**

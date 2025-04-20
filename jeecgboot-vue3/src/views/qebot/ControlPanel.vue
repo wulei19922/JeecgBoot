@@ -1,113 +1,142 @@
 <template>
-  <a-card title="机器人控制面板">
-    <a-card-grid style="width: 20%; text-align: left">
-      <a-row :wrap="true">
-        <a-col :span="12">用户：13037131937</a-col>
-        <a-col :span="12">交易对：DOGEUSDT</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">用户余额：20</a-col>
-        <a-col :span="12">利润：100</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">投入：600</a-col>
-        <a-col :span="12">运行中</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24" style="overflow: hidden">1895698783372677121_DOGEUSDT_BINANCE_spot_gride</a-col>
-      </a-row>
-    </a-card-grid>
-
-    <a-card-grid style="width: 20%; text-align: left">
-      <a-row :wrap="true">
-        <a-col :span="12">用户：13037131937</a-col>
-        <a-col :span="12">交易对：DOGEUSDT</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">用户余额：20</a-col>
-        <a-col :span="12">利润：100</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">投入：600</a-col>
-        <a-col :span="12">运行中</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24" style="overflow: hidden">1895698783372677121_DOGEUSDT_BINANCE_spot_gride</a-col>
-      </a-row>
-    </a-card-grid>
-
-    <a-card-grid style="width: 20%; text-align: left">
-      <a-row :wrap="true">
-        <a-col :span="12">用户：13037131937</a-col>
-        <a-col :span="12">交易对：DOGEUSDT</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">用户余额：20</a-col>
-        <a-col :span="12">利润：100</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">投入：600</a-col>
-        <a-col :span="12">运行中</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24" style="overflow: hidden">1895698783372677121_DOGEUSDT_BINANCE_spot_gride</a-col>
-      </a-row>
-    </a-card-grid>
-
-    <a-card-grid style="width: 20%; text-align: left">
-      <a-row :wrap="true">
-        <a-col :span="12">用户：13037131937</a-col>
-        <a-col :span="12">交易对：DOGEUSDT</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">用户余额：20</a-col>
-        <a-col :span="12">利润：100</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">投入：600</a-col>
-        <a-col :span="12">运行中</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24" style="overflow: hidden">1895698783372677121_DOGEUSDT_BINANCE_spot_gride</a-col>
-      </a-row>
-    </a-card-grid>
-    <a-card-grid style="width: 20%; text-align: left">
-      <a-row :wrap="true">
-        <a-col :span="12">用户：13037131937</a-col>
-        <a-col :span="12">交易对：DOGEUSDT</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">用户余额：20</a-col>
-        <a-col :span="12">利润：100</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">投入：600</a-col>
-        <a-col :span="12">运行中</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24" style="overflow: hidden">1895698783372677121_DOGEUSDT_BINANCE_spot_gride</a-col>
-      </a-row>
-    </a-card-grid>
-
-    <a-card-grid style="width: 20%; text-align: left">
-      <a-row :wrap="true">
-        <a-col :span="12">用户：13037131937</a-col>
-        <a-col :span="12">交易对：DOGEUSDT</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">用户余额：20</a-col>
-        <a-col :span="12">利润：100</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">投入：600</a-col>
-        <a-col :span="12">运行中</a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24" style="overflow: hidden">1895698783372677121_DOGEUSDT_BINANCE_spot_gride</a-col>
-      </a-row>
-    </a-card-grid>
-  </a-card>
+  <a-layout style="height: 100vh">
+    <a-layout-sider width="50%" theme="light">
+      <a-layout-header style="background-color: white; padding: 0">
+        <SearchHeader @search-success="searchSuccess" />
+      </a-layout-header>
+      <a-layout-content>
+        <div class="left-content">
+          <a-card title="机器人控制面板" size="small" :bordered="false">
+            <a-card-grid
+              @click="selectBot(b)"
+              :class="{ 'selected-bot': currentBot?.id === b.id }"
+              :title="'test'"
+              style="width: 33%; padding: 5px; text-align: left"
+              v-for="b in bot"
+            >
+              <a-row :wrap="true">
+                <a-col :span="12">用户{{ b.memberId_dictText }}</a-col>
+                <a-col :span="12">交易对{{ b.symbol }}</a-col>
+              </a-row>
+              <a-row>
+                <a-col :span="12">余额 100</a-col>
+                <a-col :span="12">利润 {{ b.profit }} </a-col>
+              </a-row>
+              <a-row>
+                <a-col :span="12">投入{{ b.totalInvest }}</a-col>
+                <a-col :span="12">{{ b.status_dictText }}</a-col>
+              </a-row>
+              <a-row>
+                <a-col :span="12">{{ b.tradeStatus_dictText }}</a-col>
+              </a-row>
+            </a-card-grid>
+          </a-card>
+        </div>
+      </a-layout-content>
+    </a-layout-sider>
+    <a-layout>
+      <div class="right-content">
+        <a-layout-header style="background-color: white">
+          <a-space> <a-menu @click="operateMenuClick" v-model:selectedKeys="current" mode="horizontal" :items="items" /> </a-space
+        ></a-layout-header>
+        <a-layout-content style="background-color: white">
+          <div v-if="current == 'orders'">
+            <OrderHistory :bot="currentBot" @click="controlFunction" />
+          </div>
+          <div v-if="current == 'podmanager'">
+            <PodManager :bots="bot" />
+          </div>
+          <div v-if="current == 'trademanager'">
+            <TradeManager :bot="currentBot" />
+          </div>
+          <div v-if="current == 'riskSetting'">
+            <RiskManager :bot="currentBot" />
+          </div>
+        </a-layout-content>
+      </div>
+    </a-layout>
+  </a-layout>
 </template>
-
 <script lang="ts" name="qe-coinBot" setup>
+  import { h, ref } from 'vue';
+  import SearchHeader from './components/Search.vue'; // 根据实际路径调整
+  import OrderHistory from './components/OrderHistory.vue'; // 根据实际路径调整
+  import PodManager from './components/PodManager.vue'; // 根据实际路径调整
+  import RiskManager from './components/RiskManager.vue'; // 根据实际路径调整
+  import TradeManager from './components/TradeManager.vue'; // 根据实际路径调整
+  import { PlayCircleTwoTone, SettingTwoTone, FundTwoTone,SlidersTwoTone } from '@ant-design/icons-vue';
+  import { MenuProps } from 'ant-design-vue';
+  const current = ref<string[]>(['orders']);
+  const bot = ref<Object>([]);
+  const currentBot = ref<Object>({});
+  const items = ref<MenuProps['items']>([
+    {
+      key: 'orders',
+      icon: () => h(FundTwoTone),
+      label: '历史成交',
+      title: '历史成交',
+    },
+    {
+      key: 'podmanager',
+      icon: () => h(PlayCircleTwoTone),
+      label: '启停',
+      title: '启停',
+    },
+    {
+      key: 'trademanager',
+      icon: () => h(SettingTwoTone),
+      label: '交易面板',
+      title: '交易面板',
+    },
+    {
+      key: 'riskSetting',
+      icon: () => h(SlidersTwoTone),
+      label: '风险对冲设置',
+      title: '风险对冲设置',
+    },
+  ]);
+  const searchSuccess = (data) => {
+    bot.value = data.records;
+    currentBot.value = data.records[0];
+  };
+  const controlFunction = (data) => {
+    console.log(data);
+  };
+
+  const selectBot = (bot) => {
+    // console.log(bot);
+    currentBot.value = bot;
+  };
+
+  const operateMenuClick = (menu) => {
+    console.log(menu);
+  };
 </script>
+
+<style scoped>
+  .left-content,
+  .right-content {
+    height: 100%;
+    font-size: 20px;
+    background: #ffffff;
+  }
+
+  .left-content {
+    background-color: #ffffff;
+  }
+
+  .right-content {
+    background-color: #ffffff;
+  }
+
+  :deep(.ant-card-grid) {
+    transition: all 0.3s;
+    border: 1px solid #e8e8e8; /* 默认边框 */
+  }
+
+  :deep(.selected-bot) {
+    border: 2px solid #1890ff !important; /* 选中时的蓝色边框 */
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+    z-index: 1;
+  }
+</style>
