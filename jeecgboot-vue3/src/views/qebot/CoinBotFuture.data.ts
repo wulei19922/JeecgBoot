@@ -1,71 +1,77 @@
-import {BasicColumn} from '/@/components/Table';
-import {FormSchema} from '/@/components/Table';
-import { rules} from '/@/utils/helper/validator';
+import { BasicColumn } from '/@/components/Table';
+import { FormSchema } from '/@/components/Table';
+import { rules } from '/@/utils/helper/validator';
 import { render } from '/@/utils/common/renderUtils';
 import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
-   {
+  {
     title: '交易对',
-    align:"center",
-    dataIndex: 'symbol'
-   },
-   {
+    align: 'center',
+    dataIndex: 'symbol',
+  },
+  {
     title: '类型',
-    align:"center",
-    dataIndex: 'type'
-   },
-   {
+    align: 'center',
+    dataIndex: 'type',
+  },
+  {
     title: '方向',
-    align:"center",
-    dataIndex: 'silde_dictText'
-   },
-   {
+    align: 'center',
+    dataIndex: 'silde_dictText',
+  },
+  {
     title: '平均价格',
-    align:"center",
-    dataIndex: 'avgPrice'
-   },
-   {
+    align: 'center',
+    dataIndex: 'avgPrice',
+  },
+  {
     title: '价格',
-    align:"center",
-    dataIndex: 'price'
-   },
-   {
+    align: 'center',
+    dataIndex: 'price',
+  },
+  {
     title: '数量',
-    align:"center",
-    dataIndex: 'num'
-   },
-   {
+    align: 'center',
+    dataIndex: 'num',
+  },
+  {
     title: '只减仓',
-    align:"center",
+    align: 'center',
     dataIndex: 'postionDown',
-    customRender:({text}) => {
-       return  render.renderSwitch(text, [{text:'是',value:'Y'},{text:'否',value:'N'}])
-     },
-   },
-   {
+    customRender: ({ text }) => {
+      return render.renderSwitch(text, [
+        { text: '是', value: 'Y' },
+        { text: '否', value: 'N' },
+      ]);
+    },
+  },
+  {
     title: '只做Maker',
-    align:"center",
+    align: 'center',
     dataIndex: 'isMaker',
-    customRender:({text}) => {
-       return  render.renderSwitch(text, [{text:'是',value:'Y'},{text:'否',value:'N'}])
-     },
-   },
-   {
+    customRender: ({ text }) => {
+      return render.renderSwitch(text, [
+        { text: '是', value: 'Y' },
+        { text: '否', value: 'N' },
+      ]);
+    },
+  },
+  {
     title: '触发条件',
-    align:"center",
-    dataIndex: 'activeCondition'
-   },
-   {
+    align: 'center',
+    dataIndex: 'activeCondition',
+  },
+  {
     title: '机器人',
-    align:"center",
-    dataIndex: 'botId'
-   },
-   {
+    align: 'center',
+    dataIndex: 'botId',
+  },
+  {
     title: '平台',
-    align:"center",
-    dataIndex: 'exchange_dictText'
-   },
+    align: 'center',
+    dataIndex: 'exchange_dictText',
+  },
 ];
 
 //币安合约数据
@@ -266,8 +272,7 @@ export const binanceFututeColumns: BasicColumn[] = [
 ];
 
 //查询数据
-export const searchFormSchema: FormSchema[] = [
-];
+export const searchFormSchema: FormSchema[] = [];
 //表单数据
 export const formSchema: FormSchema[] = [
   {
@@ -287,9 +292,9 @@ export const formSchema: FormSchema[] = [
     label: '方向',
     field: 'silde',
     component: 'JDictSelectTag',
-    componentProps:{
-        dictCode:"future_side"
-     },
+    componentProps: {
+      dictCode: 'future_side',
+    },
   },
   {
     label: '平均价格',
@@ -309,16 +314,14 @@ export const formSchema: FormSchema[] = [
   {
     label: '只减仓',
     field: 'postionDown',
-     component: 'JSwitch',
-     componentProps:{
-     },
+    component: 'JSwitch',
+    componentProps: {},
   },
   {
     label: '只做Maker',
     field: 'isMaker',
-     component: 'JSwitch',
-     componentProps:{
-     },
+    component: 'JSwitch',
+    componentProps: {},
   },
   {
     label: '触发条件',
@@ -334,39 +337,39 @@ export const formSchema: FormSchema[] = [
     label: '平台',
     field: 'exchange',
     component: 'JDictSelectTag',
-    componentProps:{
-        dictCode:"exchange"
-     },
+    componentProps: {
+      dictCode: 'exchange',
+    },
   },
-	// TODO 主键隐藏字段，目前写死为ID
-	{
-	  label: '',
-	  field: 'id',
-	  component: 'Input',
-	  show: false
-	},
+  // TODO 主键隐藏字段，目前写死为ID
+  {
+    label: '',
+    field: 'id',
+    component: 'Input',
+    show: false,
+  },
 ];
 
 // 高级查询数据
 export const superQuerySchema = {
-  symbol: {title: '交易对',order: 0,view: 'text', type: 'string',},
-  type: {title: '类型',order: 1,view: 'text', type: 'string',},
-  silde: {title: '方向',order: 2,view: 'list', type: 'string',dictCode: 'future_side',},
-  avgPrice: {title: '平均价格',order: 3,view: 'number', type: 'number',},
-  price: {title: '价格',order: 4,view: 'number', type: 'number',},
-  num: {title: '数量',order: 5,view: 'number', type: 'number',},
-  postionDown: {title: '只减仓',order: 6,view: 'switch', type: 'string',},
-  isMaker: {title: '只做Maker',order: 7,view: 'switch', type: 'string',},
-  activeCondition: {title: '触发条件',order: 8,view: 'text', type: 'string',},
-  botId: {title: '机器人',order: 9,view: 'text', type: 'string',},
-  exchange: {title: '平台',order: 10,view: 'list', type: 'string',dictCode: 'exchange',},
+  symbol: { title: '交易对', order: 0, view: 'text', type: 'string' },
+  type: { title: '类型', order: 1, view: 'text', type: 'string' },
+  silde: { title: '方向', order: 2, view: 'list', type: 'string', dictCode: 'future_side' },
+  avgPrice: { title: '平均价格', order: 3, view: 'number', type: 'number' },
+  price: { title: '价格', order: 4, view: 'number', type: 'number' },
+  num: { title: '数量', order: 5, view: 'number', type: 'number' },
+  postionDown: { title: '只减仓', order: 6, view: 'switch', type: 'string' },
+  isMaker: { title: '只做Maker', order: 7, view: 'switch', type: 'string' },
+  activeCondition: { title: '触发条件', order: 8, view: 'text', type: 'string' },
+  botId: { title: '机器人', order: 9, view: 'text', type: 'string' },
+  exchange: { title: '平台', order: 10, view: 'list', type: 'string', dictCode: 'exchange' },
 };
 
 /**
-* 流程表单调用这个方法获取formSchema
-* @param param
-*/
-export function getBpmFormSchema(_formData): FormSchema[]{
+ * 流程表单调用这个方法获取formSchema
+ * @param param
+ */
+export function getBpmFormSchema(_formData): FormSchema[] {
   // 默认和原始表单保持一致 如果流程中配置了权限数据，这里需要单独处理formSchema
   return formSchema;
 }
