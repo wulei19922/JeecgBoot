@@ -19,7 +19,7 @@
                 <a-col :span="12">交易对{{ b.symbol }}</a-col>
               </a-row>
               <a-row>
-                <a-col :span="12">余额 100</a-col>
+                <a-col :span="12">余额</a-col>
                 <a-col :span="12">利润 {{ b.profit }} </a-col>
               </a-row>
               <a-row>
