@@ -13,7 +13,12 @@ export const columns: BasicColumn[] = [
   {
     title: '类型',
     align: 'center',
-    dataIndex: 'type',
+    dataIndex: 'type_dictText',
+  },
+  {
+    title: '持仓方向',
+    align: 'center',
+    dataIndex: 'positionType_dictText',
   },
   {
     title: '方向',
@@ -71,6 +76,116 @@ export const columns: BasicColumn[] = [
     title: '平台',
     align: 'center',
     dataIndex: 'exchange_dictText',
+  },
+  {
+    title: '订单',
+    align: 'center',
+    dataIndex: 'orderId',
+  },
+  {
+    title: '订单状态',
+    align: 'center',
+    dataIndex: 'orderStatus_dictText',
+  },
+
+];
+//查询数据
+export const searchFormSchema: FormSchema[] = [];
+//表单数据
+export const formSchema: FormSchema[] = [
+  {
+    label: '交易对',
+    field: 'symbol',
+    component: 'Input',
+  },
+  {
+    label: '类型',
+    field: 'type',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'delegation_type',
+    },
+  },
+  {
+    label: '方向',
+    field: 'silde',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'future_side',
+    },
+  },
+  {
+    label: '平均价格',
+    field: 'avgPrice',
+    component: 'InputNumber',
+  },
+  {
+    label: '价格',
+    field: 'price',
+    component: 'InputNumber',
+  },
+  {
+    label: '数量',
+    field: 'num',
+    component: 'InputNumber',
+  },
+  {
+    label: '只减仓',
+    field: 'postionDown',
+    component: 'JSwitch',
+    componentProps: {},
+  },
+  {
+    label: '只做Maker',
+    field: 'isMaker',
+    component: 'JSwitch',
+    componentProps: {},
+  },
+  {
+    label: '触发条件',
+    field: 'activeCondition',
+    component: 'Input',
+  },
+  {
+    label: '机器人',
+    field: 'botId',
+    component: 'Input',
+  },
+  {
+    label: '平台',
+    field: 'exchange',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'exchange',
+    },
+  },
+  {
+    label: '订单',
+    field: 'orderId',
+    component: 'Input',
+  },
+  {
+    label: '订单状态',
+    field: 'orderStatus',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'BINANCE_ORDER_STATUS',
+    },
+  },
+  {
+    label: '持仓方向',
+    field: 'positionType',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'future_side',
+    },
+  },
+  // TODO 主键隐藏字段，目前写死为ID
+  {
+    label: '',
+    field: 'id',
+    component: 'Input',
+    show: false,
   },
 ];
 
@@ -271,89 +386,10 @@ export const binanceFututeColumns: BasicColumn[] = [
   },
 ];
 
-//查询数据
-export const searchFormSchema: FormSchema[] = [];
-//表单数据
-export const formSchema: FormSchema[] = [
-  {
-    label: '交易对',
-    field: 'symbol',
-    component: 'Input',
-  },
-  {
-    label: '类型',
-    field: 'type',
-    component: 'JDictSelectTag',
-    componentProps: {
-      dictCode: 'delegation_type',
-    },
-  },
-  {
-    label: '方向',
-    field: 'silde',
-    component: 'JDictSelectTag',
-    componentProps: {
-      dictCode: 'future_side',
-    },
-  },
-  {
-    label: '平均价格',
-    field: 'avgPrice',
-    component: 'InputNumber',
-  },
-  {
-    label: '价格',
-    field: 'price',
-    component: 'InputNumber',
-  },
-  {
-    label: '数量',
-    field: 'num',
-    component: 'InputNumber',
-  },
-  {
-    label: '只减仓',
-    field: 'postionDown',
-    component: 'JSwitch',
-    componentProps: {},
-  },
-  {
-    label: '只做Maker',
-    field: 'isMaker',
-    component: 'JSwitch',
-    componentProps: {},
-  },
-  {
-    label: '触发条件',
-    field: 'activeCondition',
-    component: 'Input',
-  },
-  {
-    label: '机器人',
-    field: 'botId',
-    component: 'Input',
-  },
-  {
-    label: '平台',
-    field: 'exchange',
-    component: 'JDictSelectTag',
-    componentProps: {
-      dictCode: 'exchange',
-    },
-  },
-  // TODO 主键隐藏字段，目前写死为ID
-  {
-    label: '',
-    field: 'id',
-    component: 'Input',
-    show: false,
-  },
-];
-
 // 高级查询数据
 export const superQuerySchema = {
   symbol: { title: '交易对', order: 0, view: 'text', type: 'string' },
-  type: { title: '类型', order: 1, view: 'text', type: 'string' },
+  type: { title: '类型', order: 1, view: 'list', type: 'string', dictCode: 'delegation_type' },
   silde: { title: '方向', order: 2, view: 'list', type: 'string', dictCode: 'future_side' },
   avgPrice: { title: '平均价格', order: 3, view: 'number', type: 'number' },
   price: { title: '价格', order: 4, view: 'number', type: 'number' },
@@ -363,6 +399,9 @@ export const superQuerySchema = {
   activeCondition: { title: '触发条件', order: 8, view: 'text', type: 'string' },
   botId: { title: '机器人', order: 9, view: 'text', type: 'string' },
   exchange: { title: '平台', order: 10, view: 'list', type: 'string', dictCode: 'exchange' },
+  orderId: { title: '订单', order: 11, view: 'text', type: 'string' },
+  orderStatus: { title: '订单状态', order: 12, view: 'list', type: 'string', dictCode: 'BINANCE_ORDER_STATUS' },
+  positionType: { title: '持仓方向', order: 13, view: 'list', type: 'string', dictCode: 'future_side' },
 };
 
 /**

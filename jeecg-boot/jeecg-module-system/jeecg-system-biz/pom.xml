@@ -53,6 +53,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.binance.connector</groupId>
+			<artifactId>binance-futures-connector-java</artifactId>
+			<version>3.0.5</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>
 			<version>0.4</version>

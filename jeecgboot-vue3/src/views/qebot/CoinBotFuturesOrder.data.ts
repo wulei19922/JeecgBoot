@@ -11,6 +11,11 @@ export const columns: BasicColumn[] = [
     dataIndex: 'symbol',
   },
   {
+    title: '订单',
+    align: 'center',
+    dataIndex: 'orderId',
+  },
+  {
     title: '合约倍数',
     align: 'center',
     dataIndex: 'lever',
@@ -55,10 +60,20 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'closeTime',
   },
+  // {
+  //  title: '所属机器人',
+  //  align:"center",
+  //  dataIndex: 'botId_dictText'
+  // },
   {
-    title: '所属机器人',
+    title: '订单状态',
     align: 'center',
-    dataIndex: 'botId_dictText',
+    dataIndex: 'orderStatus_dictText',
+  },
+  {
+    title: '持仓方向',
+    align: 'center',
+    dataIndex: 'positionType_dictText',
   },
 ];
 //查询数据
@@ -71,7 +86,12 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
   },
   {
-    label: '杠杆',
+    label: '订单',
+    field: 'orderId',
+    component: 'Input',
+  },
+  {
+    label: '合约倍数',
     field: 'lever',
     component: 'InputNumber',
   },
@@ -131,6 +151,22 @@ export const formSchema: FormSchema[] = [
       dictCode: 'coin_bot,instance_name,id',
     },
   },
+  {
+    label: '订单',
+    field: 'orderStatus',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'BINANCE_ORDER_STATUS',
+    },
+  },
+  {
+    label: '持仓方向',
+    field: 'positionType',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'future_side',
+    },
+  },
   // TODO 主键隐藏字段，目前写死为ID
   {
     label: '',
@@ -143,16 +179,19 @@ export const formSchema: FormSchema[] = [
 // 高级查询数据
 export const superQuerySchema = {
   symbol: { title: '交易对', order: 0, view: 'text', type: 'string' },
-  lever: { title: '合约倍数', order: 1, view: 'number', type: 'number' },
-  num: { title: '数量', order: 2, view: 'number', type: 'number' },
-  profit: { title: '平仓盈亏', order: 3, view: 'number', type: 'number' },
-  openPrice: { title: '开仓价格', order: 4, view: 'number', type: 'number' },
-  closePrice: { title: '平仓价格', order: 5, view: 'number', type: 'number' },
-  position: { title: '最大持仓', order: 6, view: 'number', type: 'number' },
-  closePostion: { title: '已平仓数量', order: 7, view: 'number', type: 'number' },
-  openTime: { title: '开仓时间', order: 8, view: 'datetime', type: 'string' },
-  closeTime: { title: '最后平仓时间', order: 9, view: 'datetime', type: 'string' },
-  botId: { title: '所属机器人', order: 10, view: 'list', type: 'string', dictTable: 'coin_bot', dictCode: 'id', dictText: 'instance_name' },
+  orderId: { title: '订单', order: 1, view: 'text', type: 'string' },
+  lever: { title: '合约倍数', order: 2, view: 'number', type: 'number' },
+  num: { title: '数量', order: 3, view: 'number', type: 'number' },
+  profit: { title: '平仓盈亏', order: 4, view: 'number', type: 'number' },
+  openPrice: { title: '开仓价格', order: 5, view: 'number', type: 'number' },
+  closePrice: { title: '平仓价格', order: 6, view: 'number', type: 'number' },
+  position: { title: '最大持仓', order: 7, view: 'number', type: 'number' },
+  closePostion: { title: '已平仓数量', order: 8, view: 'number', type: 'number' },
+  openTime: { title: '开仓时间', order: 9, view: 'datetime', type: 'string' },
+  closeTime: { title: '最后平仓时间', order: 10, view: 'datetime', type: 'string' },
+  botId: { title: '所属机器人', order: 11, view: 'list', type: 'string', dictTable: 'coin_bot', dictCode: 'id', dictText: 'instance_name' },
+  orderStatus: { title: '订单', order: 12, view: 'list', type: 'string', dictCode: 'BINANCE_ORDER_STATUS' },
+  positionType: { title: '持仓方向', order: 13, view: 'list', type: 'string', dictCode: 'future_side' },
 };
 
 /**

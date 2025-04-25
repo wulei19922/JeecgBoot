@@ -21,7 +21,7 @@
 
 <script lang="ts">
   import { defineComponent, ref, h } from 'vue';
-  import { TableColumnsType } from 'ant-design-vue';
+  import { notification, TableColumnsType } from "ant-design-vue";
   import { list as orderList } from '@/views/coinOrder/CoinOrder.api';
   import { watch, onMounted } from 'vue'; // 添加导入
   import { Tooltip as aTooltip } from 'ant-design-vue';
@@ -206,7 +206,14 @@
       };
       const initData = (bot) => {
         params.value['botId'] = bot['instanceName'];
-        if (!bot) {
+        if (!bot && params.value['botId']) {
+          return;
+        }
+        if (!bot.gridConfig) {
+          notification.error({
+            message: '提示',
+            description: '机器人初始化中！',
+          });
           return;
         }
         currentBotGrid.value = JSON.parse(bot.gridConfig);

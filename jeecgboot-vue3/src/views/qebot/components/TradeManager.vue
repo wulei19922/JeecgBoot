@@ -1,4 +1,5 @@
 <template>
+  <a-divider style="border-color: darkgrey" orientation="left" dashed>机器人操作</a-divider>
   <a-space style="width: 100%; margin-left: 10px">
     <a-input-number v-model:value="currentBot['startBuyPrice']">
       <template #addonAfter>
@@ -16,6 +17,9 @@
       <a-button type="default" size="small" :loading="loading" @click="onBotOperate('TRADE')">启动交易</a-button>
     </a-space>
   </div>
+  <a-divider style="border-color: darkgrey" orientation="left" dashed>用户账户</a-divider>
+
+  <!--  账户余额-->
 </template>
 
 <script lang="ts">
@@ -25,7 +29,7 @@
   import { initDictOptions } from '/@/utils/dict/index';
   import { Tooltip as aTooltip } from 'ant-design-vue/es/components';
   import { FormSchema } from '@/components/Form'; // 添加导入
-  import { kafkaApiPod } from '/@/views/qebot/CoinBot.api';
+  import { kafkaApiPod, walletApi } from '/@/views/qebot/CoinBot.api';
   import { List } from 'postcss/lib/list';
   import { SettingTwoTone, SaveTwoTone } from '@ant-design/icons-vue';
   export default defineComponent({
@@ -60,6 +64,7 @@
           currentBot.value = props.bot;
           console.log('当前机器人0', currentBot.value);
         }
+        getWallet();
       });
       const onBotOperate = (status) => {
         loading.value = true;
@@ -80,6 +85,15 @@
         params.value['status'] = status;
         console.log('保存机器人', currentBot.value['startBuyPrice']);
       };
+
+      const getWallet = (status) => {
+        const params = ref<Object>({});
+        params.value['userId'] = currentBot.value['memberId'];
+        walletApi(params.value).then((res) => {
+          console.log('钱包', res);
+        });
+      };
+
       const onBotStop = () => {};
       const onBotPause = () => {};
 

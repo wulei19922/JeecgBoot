@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * @Description: 机器人列表
  * @Author: jeecg-boot
- * @Date:   2025-04-05
+ * @Date:   2025-04-14
  * @Version: V1.0
  */
 @Data
@@ -173,4 +173,9 @@ public class CoinBot implements Serializable {
 	@Excel(name = "重新进入点位", width = 15)
     @ApiModelProperty(value = "重新进入点位")
     private Double startBuyPrice;
+	/**交易状态*/
+	@Excel(name = "交易状态", width = 15, dicCode = "coin_trade_status")
+	@Dict(dicCode = "coin_trade_status")
+    @ApiModelProperty(value = "交易状态")
+    private String tradeStatus;
 }

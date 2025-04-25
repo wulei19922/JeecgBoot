@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.checkerframework.checker.units.qual.A;
 import org.checkerframework.checker.units.qual.C;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
@@ -144,7 +145,6 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 		 @RequestMapping(value = "/editconfig", method = {RequestMethod.PUT,RequestMethod.POST})
 	 public Result<String> editConfig(@RequestBody JSONObject param) {
 
-		 System.out.println(param);
 		 String id = param.getString("id");
 		 String gridConfig = param.getString("gridConfig");
 		 Float addInvest = param.getFloat("addInvest");
@@ -156,7 +156,39 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 
 		 }
 	 }
+	 @AutoLog(value = "机器人列表-任务管理")
+	 @ApiOperation(value="机器人列表-任务管理", notes="机器人列表-任务管理")
+	 @RequiresPermissions("qe:coin_bot:edit")
+	 @RequestMapping(value = "/kafka/manager", method = {RequestMethod.PUT,RequestMethod.POST})
+	 public Result<String> sendDirectiveToKafka(@RequestBody JSONObject param) {
 
+		 String[] ids = param.getString("ids").split(",");
+		 String  status = param.getString("status");
+		 boolean u= coinBotService.operateBatchToKafka(Arrays.asList(ids),status);
+		 if (u){
+			 return Result.OK("处理中");
+		 }else {
+			 return Result.error("处理失败");
+
+		 }
+	 }
+
+	 @AutoLog(value = "机器人列表-机器人指令")
+	 @ApiOperation(value="机器人列表-机器人指令", notes="机器人列表-机器人指令")
+	 @RequiresPermissions("qe:coin_bot:edit")
+	 @RequestMapping(value = "/kafka/pod", method = {RequestMethod.PUT,RequestMethod.POST})
+	 public Result<String> sendDirectiveToKafkaPod(@RequestBody JSONObject param) {
+
+		 String[] ids = param.getString("ids").split(",");
+		 String  status = param.getString("status");
+		 boolean u= coinBotService.operateBatchToKafkaBot(Arrays.asList(ids),status);
+		 if (u){
+			 return Result.OK("处理中");
+		 }else {
+			 return Result.error("处理失败");
+
+		 }
+	 }
 
 	 @AutoLog(value = "机器人列表-指令")
 	 @ApiOperation(value="机器人列表-指令", notes="机器人列表-指令")

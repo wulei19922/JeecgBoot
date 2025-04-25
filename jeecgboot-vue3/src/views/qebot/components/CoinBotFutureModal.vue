@@ -33,6 +33,10 @@
       await setFieldsValue({
         ...data.record,
       });
+    } else {
+      await setFieldsValue({
+        ...data.record,
+      });
     }
     // 隐藏底部时禁用整个表单
     setProps({ disabled: !data?.showFooter });

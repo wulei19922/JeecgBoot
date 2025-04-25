@@ -28,7 +28,7 @@
         >当前委托
         <a-space style="margin-left: 10px" direction="horizontal">
           <PlusCircleTwoTone @click="addFutureDelegation()" />
-          <SyncOutlined spin /> </a-space
+          <SyncOutlined :spin="isRefrest" @click="refreshData" /> </a-space
       ></template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.title === '操作'">
@@ -51,8 +51,10 @@
   </a-space>
 
   <a-space style="width: 100%">
-    <a-table :dataSource="dataSource" :columns="futureColumns">
-      <template #title>历史仓位</template>
+    <a-table :dataSource="historyPositions" :columns="futureColumns">
+      <template #title
+        >历史订单 <a-space style="margin-left: 10px" direction="horizontal"> <SyncOutlined :spin="isRefrest" @click="refreshData" /> </a-space
+      ></template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.title === '操作'">
           <a-button type="link" @click="onBotOperate('restart', record)">
@@ -96,10 +98,12 @@
   import { FormSchema } from '@/components/Form'; // 添加导入
   import { kafkaApi } from '/@/views/qebot/CoinBot.api';
   import { list as futureList, listBinance } from '/@/views/qebot/CoinBotFuture.api';
+  import { list as historyFutureList } from '/@/views/qebot/CoinBotFuturesOrder.api';
   import { columns as delegationColumn, binanceFututeColumns } from '/@/views/qebot/CoinBotFuture.data';
   import { columns as futureOrderColumn } from '/@/views/qebot/CoinBotFuturesOrder.data';
   import { useModal } from '/@/components/Modal';
   import { List } from 'postcss/lib/list';
+  import { property } from 'xe-utils';
   export default defineComponent({
     name: 'RiskManager',
     components: {
@@ -132,40 +136,61 @@
       const dataSource = ref<[]>([]);
       const futureOrders = ref<[]>([]);
       const delagationOrders = ref<[]>([]);
+      const historyPositions = ref<[]>([]);
       const loading = ref(false);
+      const isRefrest = ref(false);
       watch(
         () => props.bot,
-        (bots) => {
-          currentBot.value = bots;
+        (bot) => {
+          currentBot.value = bot;
+          refreshData();
         },
         { deep: true, immediate: false }
       );
       onMounted(() => {
         // 在挂载时如果有初始bot值则加载数据
+        console.log('更新机器人数据', props.bot);
         if (props.bot) {
           currentBot.value = props.bot;
-          //初始化委托数据
-          const params = ref<Object>({});
-          params.value = {
-            botId: currentBot.value['id'],
-            type: 'postion',
-          };
-
-          //查询持仓
-          listBinance(params.value).then((res) => {
-            futureOrders.value = res;
-          });
-
-          params.value = {
-            botId: currentBot.value['id'],
-            type: 'openorders',
-          };
-          //创建委托
-          // listBinance(params.value).then((res) => {
-          //   delagationOrders.value = res;
-          // });
+          refreshData();
         }
       });
+      const refreshData = () => {
+        //初始化委托数据
+        isRefrest.value = true;
+        const params = ref<Object>({});
+        params.value = {
+          botId: currentBot.value['id'],
+          type: 'postion',
+        };
+
+        //查询持仓
+        listBinance(params.value).then((res) => {
+          futureOrders.value = res;
+        });
+
+        const delegationParams = ref<Object>({});
+        delegationParams.value = {
+          botId: currentBot.value['id'],
+        };
+        //委托数据
+        delegationParams.value['orderStatus'] = 'NEW';
+        futureList(delegationParams.value).then((res) => {
+          delagationOrders.value = res['records'];
+          isRefrest.value = false;
+        });
+
+        //查询历史仓位
+        const futuresOrders = ref<Object>({});
+        futuresOrders.value = {
+          botId: currentBot.value['id'],
+        };
+        historyFutureList(futuresOrders.value).then((r) => {
+          console.log('当前持仓', r);
+          historyPositions.value = r.records;
+        });
+      };
+
       const onBotOperate = (status) => {
         const params = ref<Object>({});
         params.value['id'] = currentBot.value['id'];
@@ -178,6 +203,7 @@
        */
       const addFutureDelegation = (record: Recordable) => {
         openModal(true, {
+          record: { botId: currentBot.value['id'] },
           isUpdate: false,
           showFooter: true,
         });
@@ -202,6 +228,9 @@
         openModal,
         handleSuccess,
         addFutureDelegation,
+        refreshData,
+        isRefrest,
+        historyPositions,
       };
     },
   });

@@ -126,7 +126,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'stopLoss',
   },
   {
-    title: '减仓初始价格',
+    title: '开仓初始价格',
     align: 'center',
     dataIndex: 'basePrice',
   },
@@ -380,9 +380,12 @@ export const formSchema: FormSchema[] = [
     component: 'InputNumber',
   },
   {
-    label: '减仓初始价格',
+    label: '开仓初始价格',
     field: 'basePrice',
     component: 'InputNumber',
+    dynamicRules: ({ model, schema }) => {
+      return [{ required: true, message: '开仓初始价格!' }];
+    },
   },
   {
     label: '网格配置',
@@ -457,7 +460,7 @@ export const superQuerySchema = {
   initRate: { title: '初始买入资金比例', order: 21, view: 'number', type: 'number' },
   errmsg: { title: '机器人异常信息', order: 22, view: 'text', type: 'string' },
   stopLoss: { title: '止损比例', order: 23, view: 'number', type: 'number' },
-  basePrice: { title: '减仓初始价格', order: 24, view: 'number', type: 'number' },
+  basePrice: { title: '开仓初始价格', order: 24, view: 'number', type: 'number' },
   gridConfig: { title: '网格配置', order: 25, view: 'text', type: 'string' },
   lever: { title: '合约杠杆', order: 26, view: 'number', type: 'number' },
   buyNum: { title: '累计买单', order: 27, view: 'number', type: 'number' },

@@ -124,10 +124,13 @@
   import { downloadFile, render } from '/@/utils/common/renderUtils';
   import { useUserStore } from '/@/store/modules/user';
   import msg from '@/views/demo/feat/msg/index.vue';
-  import { TableColumnsType } from 'ant-design-vue';
+  import { notification, TableColumnsType } from 'ant-design-vue';
   import HeadInfo from '@/components/chart/HeadInfo.vue';
-  import { useRouter } from "vue-router";
+  import { useRouter } from 'vue-router';
+  import { useMessage } from '@/hooks/web/useMessage';
   let router = useRouter();
+  const { NotifyApi } = useMessage();
+
   //动态调仓区域
 
   interface positionForm {
@@ -399,6 +402,13 @@
   //网格参数调仓
   const paginationGride = ref<Object>({ total: 10, current: 1, pageSize: 10 });
   const showBuyModal = (record) => {
+    if (!record.gridConfig) {
+      notification.error({
+        message: '提示',
+        description: '机器人初始化中！',
+      });
+      return;
+    }
     currentBotGrid.value = JSON.parse(record.gridConfig);
     currentBot.value = record;
     //请求匹配订单

@@ -15,6 +15,7 @@ enum Api {
   exportXls = '/qe/coinBot/exportXls',
   kafka = '/qe/coinBot/kafka/manager',
   kafkaPod = '/qe/coinBot/kafka/pod',
+  wallet = '/qe/coinBotFuture/binance/wallet',
 }
 /**
  * 导出api
@@ -77,7 +78,7 @@ export const batchOperate = (params, handleSuccess) => {
  * @param params
  */
 export const saveOrUpdate = (params, isUpdate) => {
-  let url = isUpdate ? Api.edit : Api.save;
+  const url = isUpdate ? Api.edit : Api.save;
   return defHttp.post({ url: url, params });
 };
 
@@ -86,7 +87,7 @@ export const saveOrUpdate = (params, isUpdate) => {
  * @param params
  */
 export const editConfigApi = (params) => {
-  let url = Api.editConfigApi
+  const url = Api.editConfigApi;
   return defHttp.post({ url: url, params });
 };
 /**
@@ -94,10 +95,14 @@ export const editConfigApi = (params) => {
  * @param params
  */
 export const kafkaApi = (params) => {
-  let url = Api.kafka
+  const url = Api.kafka;
   return defHttp.post({ url: url, params });
 };
 export const kafkaApiPod = (params) => {
-  let url = Api.kafkaPod
+  const url = Api.kafkaPod;
   return defHttp.post({ url: url, params });
+};
+export const walletApi = (params) => {
+  const url = Api.wallet;
+  return defHttp.get({ url: url, params });
 };
