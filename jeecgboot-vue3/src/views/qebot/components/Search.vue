@@ -1,7 +1,15 @@
 <template>
   <div class="search-container">
     <!-- 用户搜索 -->
-    <a-select allowClear v-model:value="userSearch" show-search style="width: 300px" placeholder="用户" :options="userOptions" :filter-option="filterOption" />
+    <a-select
+      allowClear
+      v-model:value="userSearch"
+      show-search
+      style="width: 300px"
+      placeholder="用户"
+      :options="userOptions"
+      :filter-option="filterOption"
+    />
     <!-- Symbol搜索 -->
     <a-select
       v-model:value="symbolSearch"
@@ -73,7 +81,8 @@
         order: 'desc',
         pageNo: 1,
         pageSize: 10,
-        status: '2',
+        // status: '2',
+        memberId: '1895698783372677121',
       }).then((res) => {
         emit('searchSuccess', res);
         searchData.value = res;

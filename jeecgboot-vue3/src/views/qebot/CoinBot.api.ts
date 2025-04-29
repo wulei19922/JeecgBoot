@@ -16,6 +16,7 @@ enum Api {
   kafka = '/qe/coinBot/kafka/manager',
   kafkaPod = '/qe/coinBot/kafka/pod',
   wallet = '/qe/coinBotFuture/binance/wallet',
+  transfer = '/qe/coinBotFuture/binance/transfer',
 }
 /**
  * 导出api
@@ -105,4 +106,8 @@ export const kafkaApiPod = (params) => {
 export const walletApi = (params) => {
   const url = Api.wallet;
   return defHttp.get({ url: url, params });
+};
+export const transferApi = (params) => {
+  const url = Api.transfer;
+  return defHttp.post({ url: url, params });
 };

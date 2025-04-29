@@ -52,6 +52,9 @@
           <div v-if="current == 'riskSetting'">
             <RiskManager :bot="currentBot" />
           </div>
+          <div v-if="current == 'botSetting'">
+            <CoinBotSetting @register="registerForm" :bot="currentBot" :isUpdate=true />
+          </div>
         </a-layout-content>
       </div>
     </a-layout>
@@ -64,8 +67,11 @@
   import PodManager from './components/PodManager.vue'; // 根据实际路径调整
   import RiskManager from './components/RiskManager.vue'; // 根据实际路径调整
   import TradeManager from './components/TradeManager.vue'; // 根据实际路径调整
-  import { PlayCircleTwoTone, SettingTwoTone, FundTwoTone,SlidersTwoTone } from '@ant-design/icons-vue';
+  import CoinBotSetting from './components/CoinBotSetting.vue'; // 根据实际路径调整
+  import { PlayCircleTwoTone, SettingTwoTone, FundTwoTone, SlidersTwoTone, EditTwoTone } from '@ant-design/icons-vue';
   import { MenuProps } from 'ant-design-vue';
+  import { useForm } from '@/components/Form';
+  import { formSchema } from '@/views/qebot/CoinBot.data';
   const current = ref<string[]>(['orders']);
   const bot = ref<Object>([]);
   const currentBot = ref<Object>({});
@@ -94,7 +100,20 @@
       label: '风险对冲设置',
       title: '风险对冲设置',
     },
+    {
+      key: 'botSetting',
+      icon: () => h(EditTwoTone),
+      label: '机器人设置',
+      title: '机器人设置',
+    },
   ]);
+
+  const [registerForm, { setProps, resetFields, setFieldsValue, validate, scrollToField }] = useForm({
+    schemas: formSchema,
+    showActionButtonGroup: false,
+    baseColProps: { span: 12 },
+  });
+
   const searchSuccess = (data) => {
     bot.value = data.records;
     currentBot.value = data.records[0];

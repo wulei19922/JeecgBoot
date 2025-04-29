@@ -12,6 +12,7 @@ import com.binance.connector.futures.client.impl.UMFuturesClientImpl;
 import com.binance.connector.futures.client.impl.um_futures.UMUserData;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
+import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.qe.entity.*;
 import org.jeecg.modules.qe.service.ICoinBotFutureService;
@@ -20,6 +21,9 @@ import org.jeecg.modules.qe.service.ICoinKeysService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,7 +50,7 @@ public class BinanceFuturesService {
 
 
 
-    public JSONArray getAssetInfo(String userId) {
+    public JSONObject getAssetInfo(String userId) {
         //获得机机器人symbol
         QueryWrapper<CoinKeys> queryWrapper = new QueryWrapper();
         queryWrapper.eq("member_id", userId);
@@ -56,11 +60,56 @@ public class BinanceFuturesService {
         String apiKey = key.getApiKey();
         String secretKey = key.getApiSecret();
         LinkedHashMap<String, Object> parameters = new LinkedHashMap<>();
-        UMFuturesClientImpl client = new UMFuturesClientImpl(apiKey, secretKey);
+        UMFuturesClientImpl futuresClient = new UMFuturesClientImpl(apiKey, secretKey);
+        SpotClientImpl spotClient=new SpotClientImpl(apiKey, secretKey);
+        // 合约账户信息
+        String  umUserData = futuresClient.account().futuresAccountBalance(parameters);
+        // 合一持仓盈亏信息
+        String  spotUserData = spotClient.createWallet().getUserAsset(parameters);
 
-        String  umUserData = client.account().futuresAccountBalance(parameters);
-        JSONArray jsonObject = JSON.parseArray(umUserData);
+        JSONArray futures = JSON.parseArray(umUserData);
+        JSONArray spot = JSON.parseArray(spotUserData);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("futures", futures);
+        jsonObject.put("spot", spot);
         return  jsonObject;
+    }
+
+
+    /**
+     *
+     * @param userId
+     * @return
+     */
+    public JSONArray getIncomeList(String userId,String symbol) {
+        //获得机机器人symbol
+        QueryWrapper<CoinKeys> queryWrapper = new QueryWrapper();
+        queryWrapper.eq("member_id", userId);
+        queryWrapper.eq("env", "prod");
+        queryWrapper.eq("exchange", "BINANCE");
+        CoinKeys  key = iCoinKeysService.list(queryWrapper).stream().findFirst().orElse(null);
+        String apiKey = key.getApiKey();
+        String secretKey = key.getApiSecret();
+        LinkedHashMap<String, Object> parameters = new LinkedHashMap<>();
+        UMFuturesClientImpl futuresClient = new UMFuturesClientImpl(apiKey, secretKey);
+        SpotClientImpl spotClient=new SpotClientImpl(apiKey, secretKey);
+        // 新增时间范围参数
+        LocalDateTime startOfTwoDaysAgo = LocalDateTime.now()
+                .minusDays(1) // 减去1天得到昨天
+                .toLocalDate()
+                .atStartOfDay(); // 昨天0点
+        LocalDateTime endTime = LocalDateTime.now(); // 当前时间
+
+        parameters.put("symbol", symbol);
+        parameters.put("startTime", startOfTwoDaysAgo.toInstant(ZoneOffset.UTC).toEpochMilli());
+        parameters.put("endTime", endTime.toInstant(ZoneOffset.UTC).toEpochMilli());
+
+        // 合约账户信息
+        String  umUserData = futuresClient.account().getIncomeHistory(parameters);
+        // 合一持仓盈亏信息
+
+        JSONArray objects = JSON.parseArray(umUserData);
+        return  objects;
     }
     /**
      * 查询用户合约持仓
@@ -221,4 +270,49 @@ public class BinanceFuturesService {
 
         return  null;
     }
+
+    public Result<Object> transferFromFuturesToSpot(String userId, String asset, String amount, String type) {
+        // 1. 获取用户API密钥
+        CoinKeys key = getCoinKeys(userId);
+        if (key == null) {
+            return null;
+        }
+
+        // 2. 初始化现货客户端（划转需通过现货接口）
+        SpotClientImpl spotClient = new SpotClientImpl(key.getApiKey(), key.getApiSecret());
+
+        // 3. 构建划转参数
+        LinkedHashMap<String, Object> parameters = new LinkedHashMap<>();
+        parameters.put("asset", "USDT");         // 转账币种如USDT
+        parameters.put("amount", amount);
+        if (type.equals("tospot")){
+         parameters.put("type", "UMFUTURE_MAIN"); // 从U本位合约转出
+        }
+        if (type.equals("tofutures")){
+            parameters.put("type", "MAIN_UMFUTURE"); // 从U本位合约转出
+        }
+         // 转账数量
+
+        try {
+            // 4. 调用划转接口
+            String result = spotClient.createWallet().universalTransfer(parameters);
+            return Result.ok(JSONObject.parseObject(result));
+        } catch (BinanceClientException e) {
+            log.error("划转失败: code={} msg={}", e.getErrorCode(), e.getMessage());
+            return Result.error("划转失败: code=" + e.getErrorCode() + " msg=" + e.getMessage());
+        } catch (BinanceConnectorException e) {
+            log.error("连接异常: {}", e.getMessage());
+            return Result.error("连接异常: " + e.getMessage());
+        }
+    }
+
+    // 公共密钥获取方法（复用现有代码逻辑）
+    private CoinKeys getCoinKeys(String userId) {
+        QueryWrapper<CoinKeys> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("member_id", userId)
+                .eq("env", "prod")
+                .eq("exchange", "BINANCE");
+        return iCoinKeysService.list(queryWrapper).stream().findFirst().orElse(null);
+    }
+
 }

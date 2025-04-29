@@ -33,7 +33,7 @@ export const CONTROLL_ROUTE: AppRouteRecordRaw = {
       name: 'panel',
       component: () => import('/@/views/qebot/ControlPanel.vue'),
       meta: {
-        title: 'AI助手',
+        title: '控制面板',
       },
     },
   ],

@@ -99,8 +99,25 @@ public class CoinBotFutureController extends JeecgController<CoinBotFuture, ICoi
 	 @ApiOperation(value="机器人合约表-获得账户余额", notes="机器人合约表-获得账户余额")
 	 @GetMapping(value = "/binance/wallet")
 	 public Result<Object> getWallet(@RequestParam("userId")String userId) {
-		 JSONArray futuresPostions = binanceFuturesService.getAssetInfo(userId);
+		 JSONObject futuresPostions = binanceFuturesService.getAssetInfo(userId);
 		 return  Result.OK(futuresPostions);
+	 }
+
+	 @ApiOperation(value="机器人合约表-获得账户余额", notes="机器人合约表-获得账户余额")
+	 @GetMapping(value = "/binance/incomelist")
+	 public Result<Object> getIncomeList(@RequestParam("userId")String userId,@RequestParam("symbol")String symbol) {
+		 JSONArray futuresPostions = binanceFuturesService.getIncomeList(userId,symbol);
+		 return  Result.OK(futuresPostions);
+	 }
+
+	 @ApiOperation(value="机器人合约表-获得账户余额", notes="机器人合约表-获得账户余额")
+	 @PostMapping(value = "/binance/transfer")
+	 public Result<Object> transferWallet(@RequestBody JSONObject params) {
+		 String userId = params.getString("userId");
+		 String amount = params.getString("amount");
+		 String type = params.getString("type");
+		 Result<Object> r = binanceFuturesService.transferFromFuturesToSpot(userId,"USDT", amount,type);
+		 return  r;
 	 }
 
 	 @ApiOperation(value="机器人合约表-创建订单", notes="机器人合约表-创建订单")
