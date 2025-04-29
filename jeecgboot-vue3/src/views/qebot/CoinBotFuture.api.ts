@@ -6,6 +6,7 @@ const { createConfirm } = useMessage();
 enum Api {
   list = '/qe/coinBotFuture/list',
   binanceList = '/qe/coinBotFuture/binance/list',
+  incomelist = '/qe/coinBotFuture/binance/incomelist',
   save='/qe/coinBotFuture/add',
   edit='/qe/coinBotFuture/edit',
   deleteOne = '/qe/coinBotFuture/delete',
@@ -37,8 +38,8 @@ export const listBinance = (params) =>
   defHttp.get({url: Api.binanceList, params});
 
 
-
-
+export const  incomeBinance = (params) =>
+  defHttp.get({url: Api.incomelist, params});
 
 /**
  * 删除单个
