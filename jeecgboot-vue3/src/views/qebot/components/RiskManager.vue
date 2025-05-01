@@ -28,20 +28,23 @@
         >当前委托
         <a-space style="margin-left: 10px" direction="horizontal">
           <PlusCircleTwoTone @click="addFutureDelegation()" />
-          <SyncOutlined :spin="isRefrest" @click="refreshData" /> </a-space></template
-      >S
+          <SyncOutlined :spin="isRefrest" @click="refreshData" /> </a-space
+      ></template>
     </a-table>
   </a-space>
 
   <a-space style="width: 100%">
-    <a-table :dataSource="futuresIncome" :columns="incomeColumns">
+    <a-table :dataSource="futuresIncome" style="width: 100%" :pagination="incomePage" :columns="incomeColumns" @change="handleIncomeTableChange">
       <template #title
-        >持仓盈亏 <a-space style="margin-left: 10px" direction="horizontal"> <SyncOutlined :spin="isRefrest" @click="refreshData" /> </a-space
+        >持仓盈亏
+        <a-space style="margin-left: 10px" direction="horizontal">
+          <SyncOutlined :spin="isRefrest" @click="refreshData" />
+          <a-date-picker style="width: 150px;" v-model:value="incomeDay" @change="daySelect" /> </a-space
       ></template>
     </a-table>
   </a-space>
   <a-space style="width: 100%">
-    <a-table :dataSource="historyPositions" :columns="futureColumns">
+    <a-table :dataSource="historyPositions" :columns="futureColumns" :pagination="historyPositionsPage" @change="handlePositionHisTableChange"  >
       <template #title
         >历史订单 <a-space style="margin-left: 10px" direction="horizontal"> <SyncOutlined :spin="isRefrest" @click="refreshData" /> </a-space
       ></template>
@@ -54,6 +57,7 @@
 
 <script lang="ts">
   import { defineComponent, h, ref } from 'vue';
+  import dayjs, { Dayjs } from 'dayjs';
   import { watch, onMounted } from 'vue';
   import { TableColumnsType } from 'ant-design-vue';
   import { initDictOptions } from '/@/utils/dict/index';
@@ -115,6 +119,9 @@
       const futuresIncome = ref<[]>([]);
       const loading = ref(false);
       const isRefrest = ref(false);
+
+      const dateFormat = 'YYYY-MM-DD';
+      const incomeDay = ref<Dayjs>(dayjs());
       watch(
         () => props.bot,
         (bot) => {
@@ -131,6 +138,11 @@
           refreshData();
         }
       });
+      const incomePage = ref<Object>({ total: 20, current: 1, pageSize: 2 });
+      const historyPositionsPage = ref<Object>({ total: 20, current: 1, pageSize: 2 });
+      const futuresIncomeParam = ref<Object>({});
+      //查询历史仓位
+      const futuresOrders = ref<Object>({});
       const refreshData = () => {
         //初始化委托数据
         isRefrest.value = true;
@@ -156,22 +168,25 @@
           isRefrest.value = false;
         });
 
-        //查询历史仓位
-        const futuresOrders = ref<Object>({});
+
         futuresOrders.value = {
           botId: currentBot.value['id'],
         };
         historyFutureList(futuresOrders.value).then((r) => {
-          console.log('当前持仓', r);
           historyPositions.value = r.records;
+          historyPositionsPage.value['pageSize'] = r.size;
+          historyPositionsPage.value['total'] = r.total;
+          historyPositionsPage.value['current'] = r.current;
         });
-        const futuresIncomeParam = ref<Object>({});
         futuresIncomeParam.value = {
           userId: currentBot.value['memberId'],
           symbol: currentBot.value['symbol'],
+          day: incomeDay.value.valueOf(),
         };
         incomeBinance(futuresIncomeParam.value).then((r) => {
-          console.log('盈亏记录', r);
+          incomePage.value['pageSize'] = 10;
+          incomePage.value['total'] = r.length;
+          incomePage.value['current'] = 1;
           futuresIncome.value = r;
         });
       };
@@ -191,6 +206,33 @@
           record: { botId: currentBot.value['id'] },
           isUpdate: false,
           showFooter: true,
+        });
+      };
+
+      const daySelect = (day) => {
+        futuresIncomeParam.value = {
+          userId: currentBot.value['memberId'],
+          symbol: currentBot.value['symbol'],
+          day: incomeDay.value.valueOf(),
+        };
+        incomeBinance(futuresIncomeParam.value).then((r) => {
+          incomePage.value['pageSize'] = 10;
+          incomePage.value['total'] = r.length;
+          incomePage.value['current'] = 1;
+          futuresIncome.value = r;
+        });
+      };
+      const handleIncomeTableChange = (page) => {
+        incomePage.value['current'] = page.current;
+        incomePage.value['pageSize'] = page.pageSize;
+      };
+      const handlePositionHisTableChange = (page) => {
+        futuresOrders.value['pageNo'] = page.current;
+        historyFutureList(futuresOrders.value).then((r) => {
+          historyPositions.value = r.records;
+          historyPositionsPage.value['pageSize'] = r.size;
+          historyPositionsPage.value['total'] = r.total;
+          historyPositionsPage.value['current'] = r.current;
         });
       };
 
@@ -218,6 +260,12 @@
         historyPositions,
         incomeColumns,
         futuresIncome,
+        incomePage,
+        historyPositionsPage,
+        daySelect,
+        incomeDay,
+        handleIncomeTableChange,
+        handlePositionHisTableChange,
       };
     },
   });
@@ -235,6 +283,9 @@
   }
   ::v-deep(.ant-table) {
     font-size: 11px;
+  }
+  ::v-deep(.ant-space-item) {
+    width: 100%;
   }
   ::v-deep(.ant-table-thead > tr > th) {
     font-size: 11px;

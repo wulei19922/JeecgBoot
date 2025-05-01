@@ -105,8 +105,8 @@ public class CoinBotFutureController extends JeecgController<CoinBotFuture, ICoi
 
 	 @ApiOperation(value="机器人合约表-获得账户余额", notes="机器人合约表-获得账户余额")
 	 @GetMapping(value = "/binance/incomelist")
-	 public Result<Object> getIncomeList(@RequestParam("userId")String userId,@RequestParam("symbol")String symbol) {
-		 JSONArray futuresPostions = binanceFuturesService.getIncomeList(userId,symbol);
+	 public Result<Object> getIncomeList(@RequestParam("userId")String userId,@RequestParam("symbol")String symbol,@RequestParam("day")Long  day) {
+		 JSONArray futuresPostions = binanceFuturesService.getIncomeList(userId,symbol,day);
 		 return  Result.OK(futuresPostions);
 	 }
 

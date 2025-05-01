@@ -152,7 +152,7 @@ public class BinanceClientService {
                     rone.setChange24Hours(one.getFloat("priceChange"));
                 }
         );
-        redisUtil.set("QUETO",JSON.toJSON(result),1000);
+        redisUtil.set("QUETO",JSON.toJSON(result),5);
         return result;
     }
 

@@ -81,8 +81,8 @@
         order: 'desc',
         pageNo: 1,
         pageSize: 10,
-        // status: '2',
-        memberId: '1895698783372677121',
+        status: '2',
+        // memberId: '1895698783372677121',
       }).then((res) => {
         emit('searchSuccess', res);
         searchData.value = res;

@@ -15,15 +15,15 @@
               v-for="b in bot"
             >
               <a-row :wrap="true">
-                <a-col :span="12">用户{{ b.memberId_dictText }}</a-col>
-                <a-col :span="12">交易对{{ b.symbol }}</a-col>
+                <a-col :span="12">用户: {{ b.memberId_dictText }}</a-col>
+                <a-col :span="12">交易对: {{ b.symbol }}</a-col>
               </a-row>
               <a-row>
-                <a-col :span="12">余额</a-col>
-                <a-col :span="12">利润 {{ b.profit }} </a-col>
+                <a-col :span="12">持仓利润: {{ b.positionProfit }}</a-col>
+                <a-col :span="12">总计利润: {{ b.profit }} </a-col>
               </a-row>
               <a-row>
-                <a-col :span="12">投入{{ b.totalInvest }}</a-col>
+                <a-col :span="12">投入: {{ b.totalInvest }}</a-col>
                 <a-col :span="12">{{ b.status_dictText }}</a-col>
               </a-row>
               <a-row>
@@ -53,7 +53,7 @@
             <RiskManager :bot="currentBot" />
           </div>
           <div v-if="current == 'botSetting'">
-            <CoinBotSetting @register="registerForm" :bot="currentBot" :isUpdate=true />
+            <CoinBotSetting @register="registerForm" :bot="currentBot" :isUpdate="true" />
           </div>
         </a-layout-content>
       </div>
@@ -115,7 +115,24 @@
   });
 
   const searchSuccess = (data) => {
+    //计算持仓盈亏
+    data.records.forEach((bot) => {
+      if (bot['gridConfig']) {
+        let botGrids = JSON.parse(bot['gridConfig']);
+        let buy_order_num_all = 0;
+        let buy_order_num_all_cost = 0;
+        botGrids.forEach((grid) => {
+          if (grid['buy_order_id']) {
+            buy_order_num_all += grid['buy_order_num'];
+            buy_order_num_all_cost += grid['buy_order_num'] * grid['buy_price'];
+          }
+        });
+        let buy_order_num_all_current = buy_order_num_all * bot['currentPrice'];
+        bot['positionProfit'] = (buy_order_num_all_current - buy_order_num_all_cost).toFixed(2);
+      }
+    });
     bot.value = data.records;
+
     currentBot.value = data.records[0];
   };
   const controlFunction = (data) => {

@@ -206,11 +206,13 @@ export const binanceFututeIncomeColumns: BasicColumn[] = [
     title: '交易对',
     align: 'center',
     dataIndex: 'symbol',
+    minWidth: 100,
   },
   {
     title: '收益类型',
     align: 'center',
     dataIndex: 'incomeType',
+    minWidth: 100,
     customRender: ({ text }) => {
       return render.renderSwitch(text, [
         { text: '划转', value: 'TRANSFER' },
@@ -227,20 +229,24 @@ export const binanceFututeIncomeColumns: BasicColumn[] = [
     title: '收益',
     align: 'center',
     dataIndex: 'income',
+    minWidth: 100,
   },
   {
     title: '资产',
     align: 'center',
     dataIndex: 'asset',
+    minWidth: 100,
   },
   {
     title: '信息',
     align: 'center',
     dataIndex: 'info',
+    minWidth: 100,
   },
   {
     title: '时间',
     align: 'center',
+    minWidth: 100,
     dataIndex: 'time',
     customRender: ({ text }) => {
       if (!text) return '-';

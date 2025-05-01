@@ -21,9 +21,7 @@ import org.jeecg.modules.qe.service.ICoinKeysService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,7 +79,7 @@ public class BinanceFuturesService {
      * @param userId
      * @return
      */
-    public JSONArray getIncomeList(String userId,String symbol) {
+    public JSONArray getIncomeList(String userId,String symbol,Long day) {
         //获得机机器人symbol
         QueryWrapper<CoinKeys> queryWrapper = new QueryWrapper();
         queryWrapper.eq("member_id", userId);
@@ -94,14 +92,19 @@ public class BinanceFuturesService {
         UMFuturesClientImpl futuresClient = new UMFuturesClientImpl(apiKey, secretKey);
         SpotClientImpl spotClient=new SpotClientImpl(apiKey, secretKey);
         // 新增时间范围参数
-        LocalDateTime startOfTwoDaysAgo = LocalDateTime.now()
-                .minusDays(1) // 减去1天得到昨天
-                .toLocalDate()
-                .atStartOfDay(); // 昨天0点
-        LocalDateTime endTime = LocalDateTime.now(); // 当前时间
+        LocalDateTime inputDay = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(day),
+                ZoneOffset.UTC
+        );
+        // 当天的开始时间（00:00:00）
+        LocalDateTime startTime = inputDay.toLocalDate().atStartOfDay();
+
+        // 当天的结束时间（23:59:59.999）
+        LocalDateTime endTime = inputDay.toLocalDate().atTime(LocalTime.MAX);
+
 
         parameters.put("symbol", symbol);
-        parameters.put("startTime", startOfTwoDaysAgo.toInstant(ZoneOffset.UTC).toEpochMilli());
+        parameters.put("startTime", startTime.toInstant(ZoneOffset.UTC).toEpochMilli());
         parameters.put("endTime", endTime.toInstant(ZoneOffset.UTC).toEpochMilli());
 
         // 合约账户信息

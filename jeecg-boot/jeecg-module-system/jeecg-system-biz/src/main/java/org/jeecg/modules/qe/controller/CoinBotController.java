@@ -77,22 +77,48 @@ public class CoinBotController extends JeecgController<CoinBot, ICoinBotService>
 	//@AutoLog(value = "机器人列表-分页列表查询")
 	@ApiOperation(value="机器人列表-分页列表查询", notes="机器人列表-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<CoinBot>> queryPageList(CoinBot coinBot,
+	public Result<IPage<CoinBotDTO>> queryPageList(CoinBot coinBot,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-        // 自定义查询规则
+//        // 自定义查询规则
         Map<String, QueryRuleEnum> customeRuleMap = new HashMap<>();
-        // 自定义多选的查询规则为：LIKE_WITH_OR
-        customeRuleMap.put("status", QueryRuleEnum.LIKE_WITH_OR);
-        customeRuleMap.put("openStatus", QueryRuleEnum.LIKE_WITH_OR);
-        customeRuleMap.put("memberId", QueryRuleEnum.LIKE_WITH_OR);
-        QueryWrapper<CoinBot> queryWrapper = QueryGenerator.initQueryWrapper(coinBot, req.getParameterMap(),customeRuleMap);
+//        // 自定义多选的查询规则为：LIKE_WITH_OR
+//        customeRuleMap.put("status", QueryRuleEnum.LIKE_WITH_OR);
+//        customeRuleMap.put("openStatus", QueryRuleEnum.LIKE_WITH_OR);
+//        customeRuleMap.put("memberId", QueryRuleEnum.LIKE_WITH_OR);
+//        QueryWrapper<CoinBot> queryWrapper = QueryGenerator.initQueryWrapper(coinBot, req.getParameterMap(),customeRuleMap);
+////		queryWrapper.select(CoinBot.class, tableField -> !tableField.getColumn().equals("grid_config"));
+//		Page<CoinBot> page = new Page<CoinBot>(pageNo, pageSize);
+//		IPage<CoinBot> pageList = coinBotService.page(page, queryWrapper);
+
+		customeRuleMap.put("status", QueryRuleEnum.LIKE_WITH_OR);
+		customeRuleMap.put("openStatus", QueryRuleEnum.LIKE_WITH_OR);
+		customeRuleMap.put("memberId", QueryRuleEnum.LIKE_WITH_OR);
+		QueryWrapper<CoinBot> queryWrapper = QueryGenerator.initQueryWrapper(coinBot, req.getParameterMap(),customeRuleMap);
 //		queryWrapper.select(CoinBot.class, tableField -> !tableField.getColumn().equals("grid_config"));
 		Page<CoinBot> page = new Page<CoinBot>(pageNo, pageSize);
 		IPage<CoinBot> pageList = coinBotService.page(page, queryWrapper);
+		//封装当当前行情价格
 
-		return Result.OK(pageList);
+		List<TickerResutl> list = binanceClientService.getList(false);
+		List<CoinBotDTO> newRecord = pageList.getRecords().stream().map(bot -> {
+			TickerResutl tickerResutl = list.stream().filter(ticker -> ticker.getBaseCoin().toUpperCase().equals(bot.getSymbol().toUpperCase())).findFirst().orElse(null);
+			CoinBotDTO dto = new CoinBotDTO();
+			if (tickerResutl != null) {
+				BeanUtils.copyProperties(bot, dto);
+				dto.setCurrentPrice(tickerResutl.getPriceUsd());
+			}else{
+				dto.setCurrentPrice(0f);
+			}
+
+			return  dto;
+		}).collect(Collectors.toList());
+		IPage<CoinBotDTO> newpageList= new Page<CoinBotDTO>(pageNo,pageSize);
+		newpageList.setRecords(newRecord);
+		newpageList.setTotal(pageList.getTotal());
+		newpageList.setCurrent(pageList.getCurrent());
+		return Result.OK(newpageList);
 	}
 	
 	/**
