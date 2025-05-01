@@ -39,12 +39,14 @@
         >持仓盈亏
         <a-space style="margin-left: 10px" direction="horizontal">
           <SyncOutlined :spin="isRefrest" @click="refreshData" />
-          <a-date-picker style="width: 150px;" v-model:value="incomeDay" @change="daySelect" /> </a-space
-      ></template>
+          <a-date-picker style="width: 150px" v-model:value="incomeDay" @change="daySelect" />
+          <a-tag color="green">当日累计盈亏:{{ incomeSum.toFixed(2) }}</a-tag>
+        </a-space></template
+      >
     </a-table>
   </a-space>
   <a-space style="width: 100%">
-    <a-table :dataSource="historyPositions" :columns="futureColumns" :pagination="historyPositionsPage" @change="handlePositionHisTableChange"  >
+    <a-table :dataSource="historyPositions" :columns="futureColumns" :pagination="historyPositionsPage" @change="handlePositionHisTableChange">
       <template #title
         >历史订单 <a-space style="margin-left: 10px" direction="horizontal"> <SyncOutlined :spin="isRefrest" @click="refreshData" /> </a-space
       ></template>
@@ -139,6 +141,7 @@
         }
       });
       const incomePage = ref<Object>({ total: 20, current: 1, pageSize: 2 });
+      const incomeSum = ref<Number>(0);
       const historyPositionsPage = ref<Object>({ total: 20, current: 1, pageSize: 2 });
       const futuresIncomeParam = ref<Object>({});
       //查询历史仓位
@@ -168,7 +171,6 @@
           isRefrest.value = false;
         });
 
-
         futuresOrders.value = {
           botId: currentBot.value['id'],
         };
@@ -188,6 +190,7 @@
           incomePage.value['total'] = r.length;
           incomePage.value['current'] = 1;
           futuresIncome.value = r;
+          incomeSum.value = r.reduce((sum, item) => sum + parseFloat(item.income || 0), 0);
         });
       };
 
@@ -220,6 +223,7 @@
           incomePage.value['total'] = r.length;
           incomePage.value['current'] = 1;
           futuresIncome.value = r;
+          incomeSum.value = r.reduce((sum, item) => sum + parseFloat(item.income || 0), 0);
         });
       };
       const handleIncomeTableChange = (page) => {
@@ -266,6 +270,7 @@
         incomeDay,
         handleIncomeTableChange,
         handlePositionHisTableChange,
+        incomeSum,
       };
     },
   });
