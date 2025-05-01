@@ -106,12 +106,16 @@ public class BinanceFuturesService {
         parameters.put("symbol", symbol);
         parameters.put("startTime", startTime.toInstant(ZoneOffset.UTC).toEpochMilli());
         parameters.put("endTime", endTime.toInstant(ZoneOffset.UTC).toEpochMilli());
+        parameters.put("limit", 1000);
 
         // 合约账户信息
         String  umUserData = futuresClient.account().getIncomeHistory(parameters);
         // 合一持仓盈亏信息
 
         JSONArray objects = JSON.parseArray(umUserData);
+        objects.sort(Comparator.comparingLong(
+                obj -> ((JSONObject) obj).getLong("time")
+        ).reversed());
         return  objects;
     }
     /**
