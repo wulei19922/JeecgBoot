@@ -163,7 +163,7 @@ spring:
           slow-sql-millis: 5000
       datasource:
         master:
-          url: jdbc:mysql://192.168.0.226:3306/lilishop?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://10.203.0.11:3306/lilishop?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
           password: lilishop
           driver-class-name: com.mysql.cj.jdbc.Driver
@@ -176,7 +176,7 @@ spring:
   #redis 配置
   redis:
     database: 0
-    host: 192.168.0.226
+    host: 10.203.0.11
     port: 6379
     password: 'lilishop'
 #mybatis plus 设置
@@ -268,17 +268,17 @@ jeecg:
   #xxl-job配置
   xxljob:
     enabled: false
-    adminAddresses: http://192.168.0.226:9080/xxl-job-admin
+    adminAddresses: http://10.203.0.11:9080/xxl-job-admin
     appname: ${spring.application.name}
     accessToken: ''
-    address: 192.168.0.226:30007
-    ip: 192.168.0.226
+    address: 10.203.0.11:30007
+    ip: 10.203.0.11
     port: 30007
     logPath: logs/jeecg/job/jobhandler/
     logRetentionDays: 30
   #分布式锁配置
   redisson:
-    address: 192.168.0.226:6379
+    address: 10.203.0.11:6379
     password: lilishop
     type: STANDALONE
     enabled: true
