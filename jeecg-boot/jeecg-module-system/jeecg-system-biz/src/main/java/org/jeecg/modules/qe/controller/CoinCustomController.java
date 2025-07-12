@@ -212,8 +212,8 @@ public class CoinCustomController {
 //        ChargeAddress address = binanceClientService.getChargeAddress("1895040445819490305");
 
         ChargeAddress address = new ChargeAddress();
-        address.setAddress("0xa25868de5723c2A5a67CED295aACfC498A4264FD");
-        address.setUrl("0xa25868de5723c2A5a67CED295aACfC498A4264FD");
+        address.setAddress("0x8c27b377cbdccf1046ae50d897842a0607b7caeb");
+        address.setUrl("0x8c27b377cbdccf1046ae50d897842a0607b7caeb");
 
         return Result.OK(address);
     }
